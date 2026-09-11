@@ -1,0 +1,1188 @@
+import {
+  Organization,
+  PpaReview,
+  BehavioralRecord,
+  CorperProfile,
+  StateCommittee,
+  ActivityLog,
+  AdminMessage,
+  SocialHandles
+} from '../types';
+
+export const INITIAL_ORGANIZATIONS: Organization[] = [
+  {
+    id: 'org-lag-01',
+    name: 'Sterling Fintech Solutions Lab',
+    state: 'Lagos',
+    lga: 'Ikeja',
+    address: 'Plot 14, Commercial Avenue, Ikeja GRA, Lagos',
+    phone: '+234 803 111 2233',
+    email: 'careers-nysc@sterlingfintech.ng',
+    sector: 'Information Technology & Software',
+    departments: ['Software Engineering', 'Data Analytics', 'Product Operations', 'DevOps'],
+    slotsNeeded: 4,
+    slotsOccupied: 2,
+    accommodation: 'None (Transport Allowance)',
+    stipendMonthly: 85000,
+    preferredDisciplines: ['Computer Science', 'Software Engineering', 'Electrical Engineering', 'Information Technology'],
+    preferredSkills: ['Python & Programming', 'Web & Frontend Development', 'Data Analysis & PowerBI/Excel'],
+    standardRating: 'Grade A - Accredited Model PPA',
+    nyscConditionsCompliant: true,
+    nyscInspectionNotes: 'Clean, modern workstations. ₦85,000 monthly allowance paid promptly by 25th. Excellent mentorship.',
+    safetyRating: 5,
+    description: 'Premier financial technology laboratory developing modern payment solutions. High corper retention rate after service year.',
+    verifiedByNysc: true,
+    featured: true
+  },
+  {
+    id: 'org-lag-02',
+    name: 'King\'s College Lagos',
+    state: 'Lagos',
+    lga: 'Lagos Island',
+    address: '3 Catholic Mission Street, TBS, Lagos Island',
+    phone: '+234 802 222 3344',
+    email: 'admin@kingscollegelagos.sch.ng',
+    sector: 'Education (Secondary/College)',
+    departments: ['Science Department', 'Mathematics Department', 'ICT / Computer Studies', 'Languages'],
+    slotsNeeded: 6,
+    slotsOccupied: 6,
+    accommodation: 'Provided (Free Corpers Lodge)',
+    stipendMonthly: 40000,
+    preferredDisciplines: ['Mathematics', 'English & Literary Studies', 'Physics', 'Chemistry', 'Computer Science', 'Education'],
+    preferredSkills: ['Classroom Pedagogy & Teaching', 'Public Speaking & Emceeing'],
+    standardRating: 'Grade A - Accredited Model PPA',
+    nyscConditionsCompliant: true,
+    nyscInspectionNotes: 'Furnished Corpers Lodge inside school quarters with 24/7 security and water supply.',
+    safetyRating: 5,
+    description: 'Prestigious federal secondary school with rich heritage. Full lodging provided in staff quarters with dedicated electricity.',
+    verifiedByNysc: true,
+    featured: true
+  },
+  {
+    id: 'org-lag-03',
+    name: 'Lagos University Teaching Hospital (LUTH)',
+    state: 'Lagos',
+    lga: 'Mushin',
+    address: 'Ishaga Road, Idi-Araba, Surulere / Mushin Axis, Lagos',
+    phone: '+234 805 333 4455',
+    email: 'nysc-desk@luth.gov.ng',
+    sector: 'Healthcare & Hospital',
+    departments: ['Internal Medicine', 'Pharmacy', 'Clinical Nursing', 'Medical Laboratory', 'Biomedical Engineering'],
+    slotsNeeded: 8,
+    slotsOccupied: 5,
+    accommodation: 'Provided (Free Corpers Lodge)',
+    stipendMonthly: 55000,
+    preferredDisciplines: ['Medicine & Surgery (MBBS)', 'Nursing Science', 'Pharmacy', 'Biochemistry', 'Medical Laboratory Science'],
+    preferredSkills: ['Healthcare Assistance & First Aid', 'Laboratory Analysis & Quality Control'],
+    standardRating: 'Grade A - Accredited Model PPA',
+    nyscConditionsCompliant: true,
+    nyscInspectionNotes: 'Doctors/Nurses lodge allocated. Free medical care for serving corp members on duty.',
+    safetyRating: 4,
+    description: 'Foremost tertiary healthcare and clinical training institution in West Africa. Hands-on clinical rotations.',
+    verifiedByNysc: true
+  },
+  {
+    id: 'org-lag-04',
+    name: 'Dangote Oil Refining Company & Petrochemical',
+    state: 'Lagos',
+    lga: 'Ibeju-Lekki',
+    address: 'Lekki Free Trade Zone, Ibeju-Lekki, Lagos',
+    phone: '+234 807 444 5566',
+    email: 'nysc.placement@dangoterefinery.com',
+    sector: 'Engineering & Construction',
+    departments: ['Process Engineering', 'Mechanical Maintenance', 'Health Safety & Environment (HSE)', 'Electrical & Instrumentation'],
+    slotsNeeded: 10,
+    slotsOccupied: 10,
+    accommodation: 'Provided (Free Corpers Lodge)',
+    stipendMonthly: 120000,
+    preferredDisciplines: ['Chemical Engineering', 'Mechanical Engineering', 'Electrical / Electronics Engineering', 'Civil Engineering'],
+    preferredSkills: ['Project Management & Operations', 'Data Analysis & PowerBI/Excel'],
+    standardRating: 'Grade A - Accredited Model PPA',
+    nyscConditionsCompliant: true,
+    nyscInspectionNotes: 'Gated residential camp, cafeteria meals provided, world-class industrial refinery exposure.',
+    safetyRating: 5,
+    description: 'The world\'s largest single-train refinery complex. Top-tier allowance with furnished executive camp accommodation.',
+    verifiedByNysc: true,
+    featured: true
+  },
+  {
+    id: 'org-fct-01',
+    name: 'National Information Technology Development Agency (NITDA)',
+    state: 'Abuja (FCT)',
+    lga: 'Municipal Area Council (AMAC)',
+    address: 'No 28, Port Harcourt Crescent, Off Gimbiya Street, Area 11, Garki, Abuja',
+    phone: '+234 812 555 6677',
+    email: 'corpers@nitda.gov.ng',
+    sector: 'Government Ministry / Parastatal',
+    departments: ['Cybersecurity & Digital Infrastructure', 'Digital Economy', 'Corporate Strategy', 'ICT Capacity Building'],
+    slotsNeeded: 5,
+    slotsOccupied: 3,
+    accommodation: 'Subsidized Housing',
+    stipendMonthly: 60000,
+    preferredDisciplines: ['Computer Science', 'Cybersecurity', 'Software Engineering', 'Law (LL.B)', 'Economics'],
+    preferredSkills: ['Python & Programming', 'Data Analysis & PowerBI/Excel', 'Legal Drafting & Research'],
+    standardRating: 'Grade A - Accredited Model PPA',
+    nyscConditionsCompliant: true,
+    nyscInspectionNotes: 'Accredited federal agency. Prompt stipends, active involvement in national tech policies.',
+    safetyRating: 5,
+    description: 'Federal parastatal spearheading Nigeria’s IT regulations and digital transformation. Top government exposure.',
+    verifiedByNysc: true,
+    featured: true
+  },
+  {
+    id: 'org-fct-02',
+    name: 'Loyola Jesuit College',
+    state: 'Abuja (FCT)',
+    lga: 'Gwagwalada',
+    address: 'Karmo Road, Gidan Mangoro, Abuja',
+    phone: '+234 809 666 7788',
+    email: 'nysc@loyolajesuit.org',
+    sector: 'Education (Secondary/College)',
+    departments: ['Mathematics', 'Sciences', 'Humanities', 'Sports & Youth Development'],
+    slotsNeeded: 4,
+    slotsOccupied: 4,
+    accommodation: 'Provided (Free Corpers Lodge)',
+    stipendMonthly: 50000,
+    preferredDisciplines: ['Mathematics', 'Physics', 'English & Literary Studies', 'Chemistry', 'Education'],
+    preferredSkills: ['Classroom Pedagogy & Teaching', 'Public Speaking & Emceeing'],
+    standardRating: 'Grade A - Accredited Model PPA',
+    nyscConditionsCompliant: true,
+    nyscInspectionNotes: 'Private air-conditioned corper lodge, meals from dining hall, serene academic sanctuary.',
+    safetyRating: 5,
+    description: 'Leading Jesuit boarding school renowned for academic excellence, moral discipline, and teacher welfare.',
+    verifiedByNysc: true
+  },
+  {
+    id: 'org-fct-03',
+    name: 'Central Bank of Nigeria (Headquarters)',
+    state: 'Abuja (FCT)',
+    lga: 'Municipal Area Council (AMAC)',
+    address: 'Plot 33, Abubakar Tafawa Balewa Way, Central Business District, Abuja',
+    phone: '+234 9 462 38700',
+    email: 'hr-nysc@cbn.gov.ng',
+    sector: 'Banking & Financial Services',
+    departments: ['Monetary Policy', 'Banking Supervision', 'Information Technology', 'Corporate Communications'],
+    slotsNeeded: 6,
+    slotsOccupied: 4,
+    accommodation: 'None (Accommodation Allowance)',
+    stipendMonthly: 75000,
+    preferredDisciplines: ['Economics', 'Accounting', 'Banking & Finance', 'Computer Science', 'Statistics'],
+    preferredSkills: ['Accounting & Financial Modeling', 'Data Analysis & PowerBI/Excel'],
+    standardRating: 'Grade A - Accredited Model PPA',
+    nyscConditionsCompliant: true,
+    nyscInspectionNotes: 'Federal apex bank. Unmatched macroeconomic policy exposure and career networking.',
+    safetyRating: 5,
+    description: 'Apex monetary institution in Nigeria. Corpers get immersed in banking supervision, economic research, and data analytics.',
+    verifiedByNysc: true
+  },
+  {
+    id: 'org-kan-01',
+    name: 'Kano State Ministry of Science & Technology',
+    state: 'Kano',
+    lga: 'Kano Municipal',
+    address: 'Audu Bako Secretariat Complex, Kano',
+    phone: '+234 803 777 8899',
+    email: 'nysc@kanoscience.gov.ng',
+    sector: 'Government Ministry / Parastatal',
+    departments: ['ICT Infrastructure', 'Technical Vocational Training', 'Planning & Statistics'],
+    slotsNeeded: 6,
+    slotsOccupied: 2,
+    accommodation: 'Provided (Free Corpers Lodge)',
+    stipendMonthly: 35000,
+    preferredDisciplines: ['Computer Science', 'Electrical / Electronics Engineering', 'Mechanical Engineering', 'Mathematics'],
+    preferredSkills: ['Web & Frontend Development', 'Data Analysis & PowerBI/Excel', 'Classroom Pedagogy & Teaching'],
+    standardRating: 'Grade B - Standard Approved',
+    nyscConditionsCompliant: true,
+    nyscInspectionNotes: 'Government-backed PPA with corpers lodge near Audu Bako secretariat.',
+    safetyRating: 4,
+    description: 'Leading technology and skill development arm of the Kano State Government.',
+    verifiedByNysc: true
+  },
+  {
+    id: 'org-kan-02',
+    name: 'Aminu Kano Teaching Hospital (AKTH)',
+    state: 'Kano',
+    lga: 'Tarauni',
+    address: 'Zaria Road, Tarauni, Kano',
+    phone: '+234 802 888 9900',
+    email: 'info@akth.org.ng',
+    sector: 'Healthcare & Hospital',
+    departments: ['Pediatrics', 'Obstetrics & Gynaecology', 'Pharmacy', 'Nursing Services'],
+    slotsNeeded: 7,
+    slotsOccupied: 7,
+    accommodation: 'Provided (Free Corpers Lodge)',
+    stipendMonthly: 50000,
+    preferredDisciplines: ['Medicine & Surgery (MBBS)', 'Nursing Science', 'Pharmacy', 'Biochemistry'],
+    preferredSkills: ['Healthcare Assistance & First Aid', 'Laboratory Analysis & Quality Control'],
+    standardRating: 'Grade A - Accredited Model PPA',
+    nyscConditionsCompliant: true,
+    nyscInspectionNotes: 'Equipped medical corpers lodge inside hospital premises, high safety, round-the-clock power.',
+    safetyRating: 4,
+    description: 'Premier tertiary healthcare center catering to Northern Nigeria and beyond.',
+    verifiedByNysc: true
+  },
+  {
+    id: 'org-riv-01',
+    name: 'TotalEnergies Exploration & Production Hub',
+    state: 'Rivers',
+    lga: 'Port Harcourt',
+    address: 'Plot 25, Trans-Amadi Industrial Layout, Port Harcourt, Rivers',
+    phone: '+234 84 230 000',
+    email: 'nysc.recruitment@totalenergies.ng',
+    sector: 'Engineering & Construction',
+    departments: ['Offshore Operations Support', 'HSE & Community Affairs', 'Digital Systems', 'Logistics'],
+    slotsNeeded: 5,
+    slotsOccupied: 5,
+    accommodation: 'Provided (Free Corpers Lodge)',
+    stipendMonthly: 110000,
+    preferredDisciplines: ['Mechanical Engineering', 'Petroleum Engineering', 'Civil Engineering', 'Computer Science'],
+    preferredSkills: ['Project Management & Operations', 'Data Analysis & PowerBI/Excel'],
+    standardRating: 'Grade A - Accredited Model PPA',
+    nyscConditionsCompliant: true,
+    nyscInspectionNotes: 'Secure corporate estate with top-grade amenities, bus transit for corpers, and strict HSE compliance.',
+    safetyRating: 5,
+    description: 'Global multi-energy major. Offers comprehensive engineering, digital, and commercial corporate experience.',
+    verifiedByNysc: true,
+    featured: true
+  },
+  {
+    id: 'org-riv-02',
+    name: 'Rivers State Model Secondary School',
+    state: 'Rivers',
+    lga: 'Obio/Akpor',
+    address: 'Rumuokwuta Junction, Port Harcourt',
+    phone: '+234 803 999 0011',
+    email: 'admin@modelsec-rivers.edu.ng',
+    sector: 'Education (Secondary/College)',
+    departments: ['Basic Sciences', 'Arts & Commercial', 'Vocational Studies'],
+    slotsNeeded: 6,
+    slotsOccupied: 3,
+    accommodation: 'Provided (Free Corpers Lodge)',
+    stipendMonthly: 30000,
+    preferredDisciplines: ['English & Literary Studies', 'Mathematics / Statistics', 'Biochemistry', 'Agricultural Science'],
+    preferredSkills: ['Classroom Pedagogy & Teaching', 'Public Speaking & Emceeing'],
+    standardRating: 'Grade B - Standard Approved',
+    nyscConditionsCompliant: true,
+    nyscInspectionNotes: 'Renovated corpers quarters with borehole and solar inverter backup.',
+    safetyRating: 4,
+    description: 'State flagship secondary school with modern science laboratories and dynamic student body.',
+    verifiedByNysc: true
+  },
+  {
+    id: 'org-oyo-01',
+    name: 'International Institute of Tropical Agriculture (IITA)',
+    state: 'Oyo',
+    lga: 'Akinyele',
+    address: 'Oyo Road, PMB 5320, Ibadan, Oyo State',
+    phone: '+234 803 978 4000',
+    email: 'iita-nysc@cgiar.org',
+    sector: 'Agriculture & Agro-allied',
+    departments: ['Biotechnology Laboratory', 'Youth Agripreneurs Hub', 'GIS & Remote Sensing', 'Communications'],
+    slotsNeeded: 6,
+    slotsOccupied: 4,
+    accommodation: 'Provided (Free Corpers Lodge)',
+    stipendMonthly: 65000,
+    preferredDisciplines: ['Agricultural Science', 'Biochemistry', 'Computer Science', 'Mass Communication'],
+    preferredSkills: ['Laboratory Analysis & Quality Control', 'Content Writing & Copywriting', 'Data Analysis & PowerBI/Excel'],
+    standardRating: 'Grade A - Accredited Model PPA',
+    nyscConditionsCompliant: true,
+    nyscInspectionNotes: 'World-renowned agricultural campus. Fully furnished housing with 24/7 power, sports complex, and lake.',
+    safetyRating: 5,
+    description: 'Global research leader tackling hunger and poverty in the tropics. World-class international research atmosphere.',
+    verifiedByNysc: true,
+    featured: true
+  },
+  {
+    id: 'org-oyo-02',
+    name: 'University College Hospital (UCH) Ibadan',
+    state: 'Oyo',
+    lga: 'Ibadan North',
+    address: 'Queen Elizabeth Road, Ibadan, Oyo State',
+    phone: '+234 802 123 4567',
+    email: 'uch-corpers@uch-ibadan.org.ng',
+    sector: 'Healthcare & Hospital',
+    departments: ['Pharmacy', 'Pathology', 'Radiology', 'Nursing', 'General Outpatient'],
+    slotsNeeded: 8,
+    slotsOccupied: 8,
+    accommodation: 'Provided (Free Corpers Lodge)',
+    stipendMonthly: 45000,
+    preferredDisciplines: ['Medicine & Surgery (MBBS)', 'Nursing Science', 'Pharmacy', 'Biochemistry'],
+    preferredSkills: ['Healthcare Assistance & First Aid', 'Laboratory Analysis & Quality Control'],
+    standardRating: 'Grade A - Accredited Model PPA',
+    nyscConditionsCompliant: true,
+    nyscInspectionNotes: 'Historical tertiary health institution. High clinical exposure and dedicated health corps lodge.',
+    safetyRating: 5,
+    description: 'Nigeria’s premier teaching hospital. Highly competitive medical PPA with top consultants.',
+    verifiedByNysc: true
+  },
+  {
+    id: 'org-ogu-01',
+    name: 'Nestle Nigeria Industrial Flow Park',
+    state: 'Ogun',
+    lga: 'Shagamu',
+    address: 'KM 60, Lagos-Ibadan Expressway, Sagamu Interchange, Ogun State',
+    phone: '+234 803 456 7890',
+    email: 'nysc@nestle.ng',
+    sector: 'Manufacturing & FMCG',
+    departments: ['Quality Assurance', 'Supply Chain & Logistics', 'Automation & Instrumentation', 'Human Resources'],
+    slotsNeeded: 5,
+    slotsOccupied: 2,
+    accommodation: 'Subsidized Housing',
+    stipendMonthly: 70000,
+    preferredDisciplines: ['Mechanical Engineering', 'Biochemistry', 'Business Administration', 'Accounting'],
+    preferredSkills: ['Project Management & Operations', 'Laboratory Analysis & Quality Control', 'Data Analysis & PowerBI/Excel'],
+    standardRating: 'Grade A - Accredited Model PPA',
+    nyscConditionsCompliant: true,
+    nyscInspectionNotes: 'Excellent industrial safety standard. Subsidized estate busing and canteen food.',
+    safetyRating: 5,
+    description: 'Leading multinational food & beverage producer with cutting-edge automated production lines.',
+    verifiedByNysc: true
+  },
+  {
+    id: 'org-enu-01',
+    name: 'Enugu Innovation & Tech Hub (E-Tech)',
+    state: 'Enugu',
+    lga: 'Enugu North',
+    address: 'Independence Layout, Near Government House, Enugu',
+    phone: '+234 806 789 0123',
+    email: 'hr@etechhub.en.gov.ng',
+    sector: 'Information Technology & Software',
+    departments: ['Fullstack Web Academy', 'Cloud Solutions', 'UI/UX Design Studio'],
+    slotsNeeded: 4,
+    slotsOccupied: 1,
+    accommodation: 'None (Transport Allowance)',
+    stipendMonthly: 50000,
+    preferredDisciplines: ['Computer Science', 'Software Engineering', 'Mass Communication'],
+    preferredSkills: ['Web & Frontend Development', 'UI/UX Design & User Research', 'Graphic Design & Branding'],
+    standardRating: 'Grade B - Standard Approved',
+    nyscConditionsCompliant: true,
+    nyscInspectionNotes: 'Creative coworking tech environment, high-speed fiber internet, and developer community events.',
+    safetyRating: 4,
+    description: 'Regional catalyst for technology entrepreneurship, digital skills, and startup incubation.',
+    verifiedByNysc: true
+  },
+  {
+    id: 'org-kad-01',
+    name: 'Kaduna State Bureau of Statistics',
+    state: 'Kaduna',
+    lga: 'Kaduna North',
+    address: 'Muhammadu Buhari Way, Kaduna',
+    phone: '+234 805 678 9012',
+    email: 'nysc@kdbs.kd.gov.ng',
+    sector: 'Government Ministry / Parastatal',
+    departments: ['Demographic Surveys', 'Economic Intelligence', 'GIS & Field Operations'],
+    slotsNeeded: 5,
+    slotsOccupied: 5,
+    accommodation: 'Subsidized Housing',
+    stipendMonthly: 45000,
+    preferredDisciplines: ['Mathematics / Statistics', 'Economics', 'Computer Science'],
+    preferredSkills: ['Data Analysis & PowerBI/Excel', 'Python & Programming'],
+    standardRating: 'Grade A - Accredited Model PPA',
+    nyscConditionsCompliant: true,
+    nyscInspectionNotes: 'High analytical rigor. Corpers participate in state socioeconomic survey designs.',
+    safetyRating: 4,
+    description: 'Government data hub driving evidence-based governance across Kaduna State.',
+    verifiedByNysc: true
+  },
+  {
+    id: 'org-ben-01',
+    name: 'Benue Valley Agro-Industrial Mills',
+    state: 'Benue',
+    lga: 'Makurdi',
+    address: 'Industrial Layout, Along Gboko Road, Makurdi, Benue',
+    phone: '+234 808 901 2345',
+    email: 'contact@benuevalleymills.com',
+    sector: 'Agriculture & Agro-allied',
+    departments: ['Grain Processing', 'Agronomy Extension', 'Accounting & Procurement'],
+    slotsNeeded: 4,
+    slotsOccupied: 2,
+    accommodation: 'Provided (Free Corpers Lodge)',
+    stipendMonthly: 35000,
+    preferredDisciplines: ['Agricultural Science', 'Accounting', 'Mechanical Engineering'],
+    preferredSkills: ['Project Management & Operations', 'Accounting & Financial Modeling'],
+    standardRating: 'Grade B - Standard Approved',
+    nyscConditionsCompliant: true,
+    nyscInspectionNotes: 'Lodge on premises with clean water and solar lighting.',
+    safetyRating: 4,
+    description: 'Large agro-processing company linking thousands of local grain and cassava farmers.',
+    verifiedByNysc: true
+  },
+  {
+    id: 'org-pla-01',
+    name: 'National Metallurgical Development Centre (NMDC)',
+    state: 'Plateau',
+    lga: 'Jos South',
+    address: 'KM 14, Zawan Roundabout, Jos, Plateau',
+    phone: '+234 803 012 3456',
+    email: 'corpers@nmdc.gov.ng',
+    sector: 'Government Ministry / Parastatal',
+    departments: ['Mineral Processing', 'Extractive Metallurgy', 'Chemical Analysis Laboratory'],
+    slotsNeeded: 4,
+    slotsOccupied: 1,
+    accommodation: 'Provided (Free Corpers Lodge)',
+    stipendMonthly: 40000,
+    preferredDisciplines: ['Civil Engineering', 'Mechanical Engineering', 'Biochemistry', 'Chemistry'],
+    preferredSkills: ['Laboratory Analysis & Quality Control', 'Research & Writing'],
+    standardRating: 'Grade B - Standard Approved',
+    nyscConditionsCompliant: true,
+    nyscInspectionNotes: 'Federal parastatal with peaceful research campus and safe residential quarters.',
+    safetyRating: 4,
+    description: 'Federal research parastatal dedicated to solid minerals, steel development, and material sciences.',
+    verifiedByNysc: true
+  }
+];
+
+export const INITIAL_CORPERS: CorperProfile[] = [
+  {
+    id: 'corp-01',
+    name: 'Chidubem Emmanuel Okafor',
+    stateCode: 'LA/24B/1042',
+    callUpNo: 'NYSC/UNN/2024/782109',
+    stateOfService: 'Lagos',
+    lgaOfService: 'Ikeja',
+    courseOfStudy: 'Computer Science',
+    category: 'Science & Tech',
+    softSkills: ['Python & Programming', 'Data Analysis & PowerBI/Excel', 'Web & Frontend Development'],
+    assignedPpaId: 'org-lag-01',
+    assignmentStatus: 'accepted',
+    servingMonth: 10,
+    serviceBatch: '2024 Batch B',
+    reviewedPpa: true,
+    phone: '+234 803 294 8812',
+    email: 'chidu.okafor@gmail.com'
+  },
+  {
+    id: 'corp-02',
+    name: 'Amina Zainab Bello',
+    stateCode: 'FC/24B/3310',
+    callUpNo: 'NYSC/ABU/2024/662019',
+    stateOfService: 'Abuja (FCT)',
+    lgaOfService: 'Municipal Area Council (AMAC)',
+    courseOfStudy: 'Economics',
+    category: 'Management & Social Sciences',
+    softSkills: ['Data Analysis & PowerBI/Excel', 'Accounting & Financial Modeling', 'Public Speaking & Emceeing'],
+    assignedPpaId: 'org-fct-03',
+    assignmentStatus: 'accepted',
+    servingMonth: 8,
+    serviceBatch: '2024 Batch B',
+    reviewedPpa: false,
+    phone: '+234 806 555 1209',
+    email: 'amina.bello@yahoo.com'
+  },
+  {
+    id: 'corp-03',
+    name: 'Oluwaseun Temitope Adeleke',
+    stateCode: 'OY/24B/0812',
+    callUpNo: 'NYSC/OAU/2024/491022',
+    stateOfService: 'Oyo',
+    lgaOfService: 'Akinyele',
+    courseOfStudy: 'Agricultural Science',
+    category: 'Agriculture',
+    softSkills: ['Laboratory Analysis & Quality Control', 'Project Management & Operations', 'Content Writing & Copywriting'],
+    assignedPpaId: 'org-oyo-01',
+    assignmentStatus: 'accepted',
+    servingMonth: 11,
+    serviceBatch: '2024 Batch B',
+    reviewedPpa: true,
+    phone: '+234 814 309 4481',
+    email: 'seun.adeleke@outlook.com'
+  },
+  {
+    id: 'corp-04',
+    name: 'Fatima Maryam Mohammed',
+    stateCode: 'KN/24B/2198',
+    callUpNo: 'NYSC/BUK/2024/318902',
+    stateOfService: 'Kano',
+    lgaOfService: 'Tarauni',
+    courseOfStudy: 'Medicine & Surgery (MBBS)',
+    category: 'Medical & Health',
+    softSkills: ['Healthcare Assistance & First Aid', 'Public Speaking & Emceeing'],
+    assignedPpaId: 'org-kan-02',
+    assignmentStatus: 'accepted',
+    servingMonth: 10,
+    serviceBatch: '2024 Batch B',
+    reviewedPpa: true,
+    phone: '+234 809 111 8723',
+    email: 'dr.fatima.m@gmail.com'
+  }
+];
+
+export const INITIAL_REVIEWS: PpaReview[] = [
+  {
+    id: 'rev-01',
+    ppaId: 'org-lag-01',
+    ppaName: 'Sterling Fintech Solutions Lab',
+    corperName: 'Chidubem Emmanuel Okafor',
+    corperStateCode: 'LA/24B/1042',
+    serviceBatch: '2024 Batch B',
+    monthsServed: 10,
+    overallRating: 5,
+    accommodationRating: 4,
+    stipendPromptnessRating: 5,
+    workCultureRating: 5,
+    mentorshipRating: 5,
+    comment: 'Exceptional place to serve fatherland! They treat corp members like full-time software associates. The ₦85,000 monthly allowance enters bank account on or before the 25th without story.',
+    adviceToNextCorpers: 'Brush up on your React and Python before coming for the interview. They will give you high-impact tasks from month one.',
+    wouldRecommend: true,
+    createdAt: '2025-06-14'
+  },
+  {
+    id: 'rev-02',
+    ppaId: 'org-oyo-01',
+    ppaName: 'International Institute of Tropical Agriculture (IITA)',
+    corperName: 'Oluwaseun Temitope Adeleke',
+    corperStateCode: 'OY/24B/0812',
+    serviceBatch: '2024 Batch B',
+    monthsServed: 11,
+    overallRating: 5,
+    accommodationRating: 5,
+    stipendPromptnessRating: 5,
+    workCultureRating: 5,
+    mentorshipRating: 5,
+    comment: 'The environment in IITA is heaven on earth. You live inside the campus with 24 hours light, clean water, swimming pool, and golf course. You learn world-standard research methodologies.',
+    adviceToNextCorpers: 'Be humble and ready to learn from international scientists. Network heavily because post-NYSC fellowships are available.',
+    wouldRecommend: true,
+    createdAt: '2025-07-02'
+  },
+  {
+    id: 'rev-03',
+    ppaId: 'org-kan-02',
+    ppaName: 'Aminu Kano Teaching Hospital (AKTH)',
+    corperName: 'Fatima Maryam Mohammed',
+    corperStateCode: 'KN/24B/2198',
+    serviceBatch: '2024 Batch B',
+    monthsServed: 10,
+    overallRating: 4,
+    accommodationRating: 4,
+    stipendPromptnessRating: 4,
+    workCultureRating: 4,
+    mentorshipRating: 5,
+    comment: 'Challenging clinical workload but tremendous learning opportunity. Consultants are approachable and guide corper doctors through complex surgeries and rounds.',
+    adviceToNextCorpers: 'Prepare for busy call duties, but your clinical acumen will double by the end of your 10th month.',
+    wouldRecommend: true,
+    createdAt: '2025-06-28'
+  },
+  {
+    id: 'rev-04',
+    ppaId: 'org-lag-02',
+    ppaName: 'King\'s College Lagos',
+    corperName: 'David Nwachukwu',
+    corperStateCode: 'LA/23C/4412',
+    serviceBatch: '2023 Batch C',
+    monthsServed: 12,
+    overallRating: 5,
+    accommodationRating: 5,
+    stipendPromptnessRating: 4,
+    workCultureRating: 4,
+    mentorshipRating: 5,
+    comment: 'Teaching at King\'s College was a lifetime honor. Free lodge in quarters, respectful students, and friendly staff. You learn leadership and crowd management.',
+    adviceToNextCorpers: 'Maintain high discipline. King’s College boys look up to corpers as role models.',
+    wouldRecommend: true,
+    createdAt: '2024-11-20'
+  }
+];
+
+export const INITIAL_BEHAVIORAL_RECORDS: BehavioralRecord[] = [
+  {
+    id: 'beh-01',
+    corperId: 'corp-01',
+    corperName: 'Chidubem Emmanuel Okafor',
+    corperStateCode: 'LA/24B/1042',
+    ppaId: 'org-lag-01',
+    ppaName: 'Sterling Fintech Solutions Lab',
+    month: 'Month 9 (July 2025)',
+    punctuality: 'Outstanding',
+    discipline: 'Exemplary',
+    workEthics: 'High Dedication',
+    integrity: 'Trustworthy',
+    monthlyClearanceStatus: 'Approved - Eligible for Federal Allowance',
+    remarks: 'Demonstrated stellar work on our payment gateway core service. Zero disciplinary complaints, consistently arrives before 8:00 AM.',
+    supervisorName: 'Engr. Femi Adeyemi (VP Engineering)',
+    submittedDate: '2025-07-28'
+  },
+  {
+    id: 'beh-02',
+    corperId: 'corp-03',
+    corperName: 'Oluwaseun Temitope Adeleke',
+    corperStateCode: 'OY/24B/0812',
+    ppaId: 'org-oyo-01',
+    ppaName: 'International Institute of Tropical Agriculture (IITA)',
+    month: 'Month 10 (August 2025)',
+    punctuality: 'Outstanding',
+    discipline: 'Exemplary',
+    workEthics: 'High Dedication',
+    integrity: 'Trustworthy',
+    monthlyClearanceStatus: 'Approved - Eligible for Federal Allowance',
+    remarks: 'Conducted agronomy data collection for our drought-resistant maize project with immense diligence. Highly recommended for state honors.',
+    supervisorName: 'Dr. Katherine Mensah (Lead Agronomist)',
+    submittedDate: '2025-08-27'
+  }
+];
+
+// Pre-registered official state committees
+export const INITIAL_STATE_COMMITTEES: StateCommittee[] = [
+  {
+    id: 'comm-lag',
+    stateName: 'Lagos',
+    stateCapital: 'Ikeja',
+    stateCodePrefix: 'LA',
+    stateCoordinator: 'Mrs. Yetunde Baderinwa',
+    secretariatAddress: 'Babs Animashaun Street, Surulere, Lagos',
+    hotline: '+234 803 300 1234',
+    email: 'lagos@nysc.gov.ng',
+    orientationCampLocation: 'NYSC Permanent Orientation Camp, Iyana-Ipaja, Lagos',
+    activeLgis: 20,
+    totalCorpersInState: 28500,
+    totalPpasRegistered: 650,
+    totalPpasOccupied: 580,
+    complianceAuditScore: 98,
+    isRegistered: true,
+    registeredAt: '2024-01-15',
+    lgisList: [
+      {
+        id: 'lgi-lag-01',
+        name: 'Inspector Babatunde Sanusi',
+        lga: 'Ikeja LGA',
+        phone: '+234 803 234 5678',
+        email: 'lgi.ikeja@nysc.gov.ng',
+        officeAddress: 'Old Secretariat, Ikeja, Lagos',
+        corpersCount: 3200
+      },
+      {
+        id: 'lgi-lag-02',
+        name: 'Inspector Folashade Adeleke',
+        lga: 'Surulere LGA',
+        phone: '+234 802 345 6789',
+        email: 'lgi.surulere@nysc.gov.ng',
+        officeAddress: 'Adeniran Ogunsanya St, Surulere, Lagos',
+        corpersCount: 2800
+      },
+      {
+        id: 'lgi-lag-03',
+        name: 'Inspector Chimaobi Okon',
+        lga: 'Lagos Island LGA',
+        phone: '+234 814 456 7890',
+        email: 'lgi.lagosisland@nysc.gov.ng',
+        officeAddress: 'Broad Street Zonal Office, Lagos Island',
+        corpersCount: 2100
+      }
+    ],
+    zonalOffices: [
+      {
+        zoneName: 'Ikeja Metropolitan Zone',
+        lgiName: 'Inspector Babatunde Sanusi',
+        contact: '+234 803 234 5678',
+        email: 'lgi.ikeja@nysc.gov.ng',
+        headquarters: 'Ikeja Local Government Secretariat',
+        corpersCount: 3200
+      },
+      {
+        zoneName: 'Surulere Mainland Zone',
+        lgiName: 'Inspector Folashade Adeleke',
+        contact: '+234 802 345 6789',
+        email: 'lgi.surulere@nysc.gov.ng',
+        headquarters: 'Surulere Zonal Office',
+        corpersCount: 2800
+      }
+    ]
+  },
+  {
+    id: 'comm-fct',
+    stateName: 'Abuja (FCT)',
+    stateCapital: 'Abuja',
+    stateCodePrefix: 'FC',
+    stateCoordinator: 'Alhaji Suleiman Bello',
+    secretariatAddress: 'Plot 416, Tigris Crescent, Maitama, Abuja (FCT)',
+    hotline: '+234 802 111 2233',
+    email: 'fct@nysc.gov.ng',
+    orientationCampLocation: 'NYSC Permanent Orientation Camp, Kubwa, Abuja',
+    activeLgis: 6,
+    totalCorpersInState: 19800,
+    totalPpasRegistered: 420,
+    totalPpasOccupied: 390,
+    complianceAuditScore: 96,
+    isRegistered: true,
+    registeredAt: '2024-01-20',
+    lgisList: [
+      {
+        id: 'lgi-fct-01',
+        name: 'Inspector Hadiza Abdullahi',
+        lga: 'Municipal Area Council (AMAC)',
+        phone: '+234 803 777 8899',
+        email: 'lgi.amac@nysc.gov.ng',
+        officeAddress: 'Area 10, Garki, Abuja',
+        corpersCount: 6500
+      },
+      {
+        id: 'lgi-fct-02',
+        name: 'Inspector David Olatunji',
+        lga: 'Bwari Area Council',
+        phone: '+234 805 666 4433',
+        email: 'lgi.bwari@nysc.gov.ng',
+        officeAddress: 'Bwari Town Hall Complex, Bwari',
+        corpersCount: 3400
+      }
+    ],
+    zonalOffices: [
+      {
+        zoneName: 'AMAC Central Zone',
+        lgiName: 'Inspector Hadiza Abdullahi',
+        contact: '+234 803 777 8899',
+        email: 'lgi.amac@nysc.gov.ng',
+        headquarters: 'Area 10 Secretariat, Garki',
+        corpersCount: 6500
+      }
+    ]
+  },
+  {
+    id: 'comm-kan',
+    stateName: 'Kano',
+    stateCapital: 'Kano',
+    stateCodePrefix: 'KN',
+    stateCoordinator: 'Hajiya Aisha Mohammed',
+    secretariatAddress: 'Gidan Murtala, Bompai Road, Kano',
+    hotline: '+234 803 999 8877',
+    email: 'kano@nysc.gov.ng',
+    orientationCampLocation: 'NYSC Permanent Orientation Camp, Kusalla Dam, Karaye, Kano',
+    activeLgis: 44,
+    totalCorpersInState: 22400,
+    totalPpasRegistered: 390,
+    totalPpasOccupied: 310,
+    complianceAuditScore: 93,
+    isRegistered: true,
+    registeredAt: '2024-02-01',
+    lgisList: [
+      {
+        id: 'lgi-kan-01',
+        name: 'Inspector Ibrahim Garba',
+        lga: 'Nassarawa LGA',
+        phone: '+234 802 888 1234',
+        email: 'lgi.nassarawa@nysc.gov.ng',
+        officeAddress: 'Nassarawa Council Office, Kano',
+        corpersCount: 2900
+      }
+    ],
+    zonalOffices: [
+      {
+        zoneName: 'Kano Metropolis Zone',
+        lgiName: 'Inspector Ibrahim Garba',
+        contact: '+234 802 888 1234',
+        email: 'lgi.nassarawa@nysc.gov.ng',
+        headquarters: 'Nassarawa Zonal Secretariat',
+        corpersCount: 2900
+      }
+    ]
+  },
+  {
+    id: 'comm-oyo',
+    stateName: 'Oyo',
+    stateCapital: 'Ibadan',
+    stateCodePrefix: 'OY',
+    stateCoordinator: 'Mr. Odoba Abel',
+    secretariatAddress: 'Agodi Secretariat Complex, Ibadan, Oyo',
+    hotline: '+234 803 444 5566',
+    email: 'oyo@nysc.gov.ng',
+    orientationCampLocation: 'NYSC Permanent Orientation Camp, Iseyin, Oyo State',
+    activeLgis: 33,
+    totalCorpersInState: 18200,
+    totalPpasRegistered: 310,
+    totalPpasOccupied: 260,
+    complianceAuditScore: 95,
+    isRegistered: true,
+    registeredAt: '2024-02-10',
+    lgisList: [
+      {
+        id: 'lgi-oyo-01',
+        name: 'Inspector Olumide Ajayi',
+        lga: 'Ibadan North LGA',
+        phone: '+234 806 333 4455',
+        email: 'lgi.ibadannorth@nysc.gov.ng',
+        officeAddress: 'Bodija Market Road, Ibadan',
+        corpersCount: 3100
+      }
+    ],
+    zonalOffices: [
+      {
+        zoneName: 'Ibadan Capital Zone',
+        lgiName: 'Inspector Olumide Ajayi',
+        contact: '+234 806 333 4455',
+        email: 'lgi.ibadannorth@nysc.gov.ng',
+        headquarters: 'Bodija Secretariat',
+        corpersCount: 3100
+      }
+    ]
+  },
+  {
+    id: 'comm-pla',
+    stateName: 'Plateau',
+    stateCapital: 'Jos',
+    stateCodePrefix: 'PL',
+    stateCoordinator: 'Rev. Jonathan Pam',
+    secretariatAddress: 'KM 5, Yakubu Gowon Way, Jos, Plateau',
+    hotline: '+234 803 666 7788',
+    email: 'plateau@nysc.gov.ng',
+    orientationCampLocation: 'NYSC Permanent Orientation Camp, Mangu, Plateau State',
+    activeLgis: 17,
+    totalCorpersInState: 12400,
+    totalPpasRegistered: 210,
+    totalPpasOccupied: 165,
+    complianceAuditScore: 92,
+    isRegistered: true,
+    registeredAt: '2024-03-01',
+    lgisList: [
+      {
+        id: 'lgi-pla-01',
+        name: 'Inspector Bitrus Dung',
+        lga: 'Jos North LGA',
+        phone: '+234 802 123 9988',
+        email: 'lgi.josnorth@nysc.gov.ng',
+        officeAddress: 'Murtala Mohammed Way, Jos',
+        corpersCount: 2200
+      }
+    ],
+    zonalOffices: [
+      {
+        zoneName: 'Jos Plateau Central',
+        lgiName: 'Inspector Bitrus Dung',
+        contact: '+234 802 123 9988',
+        email: 'lgi.josnorth@nysc.gov.ng',
+        headquarters: 'Jos North LGA Office',
+        corpersCount: 2200
+      }
+    ]
+  },
+  {
+    id: 'comm-riv',
+    stateName: 'Rivers',
+    stateCapital: 'Port Harcourt',
+    stateCodePrefix: 'RV',
+    stateCoordinator: 'Chief George Amadi',
+    secretariatAddress: 'Forces Avenue, Old GRA, Port Harcourt, Rivers',
+    hotline: '+234 803 777 3322',
+    email: 'rivers@nysc.gov.ng',
+    orientationCampLocation: 'NYSC Permanent Orientation Camp, Nonwa-Gbam, Tai LGA, Rivers',
+    activeLgis: 23,
+    totalCorpersInState: 21000,
+    totalPpasRegistered: 410,
+    totalPpasOccupied: 350,
+    complianceAuditScore: 94,
+    isRegistered: true,
+    registeredAt: '2024-03-12',
+    lgisList: [
+      {
+        id: 'lgi-riv-01',
+        name: 'Inspector Tammy Briggs',
+        lga: 'Port Harcourt City LGA',
+        phone: '+234 805 111 2244',
+        email: 'lgi.phcity@nysc.gov.ng',
+        officeAddress: 'Bank Road, Port Harcourt',
+        corpersCount: 3800
+      }
+    ],
+    zonalOffices: [
+      {
+        zoneName: 'Port Harcourt Metro Zone',
+        lgiName: 'Inspector Tammy Briggs',
+        contact: '+234 805 111 2244',
+        email: 'lgi.phcity@nysc.gov.ng',
+        headquarters: 'Forces Avenue Zonal Office',
+        corpersCount: 3800
+      }
+    ]
+  }
+];
+
+export const INITIAL_ACTIVITIES: ActivityLog[] = [
+  {
+    id: 'act-01',
+    userId: 'corp-01',
+    userName: 'Chidubem Emmanuel Okafor',
+    userRole: 'corper',
+    action: 'Registered & Accepted PPA Posting',
+    details: 'Matched to Sterling Fintech Solutions Lab in Ikeja, Lagos (Month 10 of Service).',
+    timestamp: new Date(Date.now() - 1000 * 60 * 45).toISOString()
+  },
+  {
+    id: 'act-02',
+    userId: 'org-lag-01',
+    userName: 'Sterling Fintech Solutions Lab',
+    userRole: 'organization',
+    action: 'Updated Monthly Quota & Accomodation',
+    details: 'Declared 3 needed slots with Free Corpers Lodge & ₦85,000 allowance.',
+    timestamp: new Date(Date.now() - 1000 * 60 * 120).toISOString()
+  },
+  {
+    id: 'act-03',
+    userId: 'comm-lag',
+    userName: 'Lagos State NYSC Directorate',
+    userRole: 'committee',
+    action: 'Audited PPA Compliance',
+    details: 'Verified 12 establishments for compliance with NYSC welfare charter.',
+    timestamp: new Date(Date.now() - 1000 * 60 * 240).toISOString()
+  },
+  {
+    id: 'act-04',
+    userId: 'corp-03',
+    userName: 'Oluwaseun Temitope Adeleke',
+    userRole: 'corper',
+    action: 'Submitted 10-Month PPA Review',
+    details: 'Awarded 5 Stars to IITA for agricultural mentorship and free housing.',
+    timestamp: new Date(Date.now() - 1000 * 60 * 360).toISOString()
+  }
+];
+
+export const INITIAL_ADMIN_MESSAGES: AdminMessage[] = [
+  {
+    id: 'msg-01',
+    recipientId: 'all',
+    recipientName: 'All Corps Members',
+    recipientEmail: 'corpers-all@nysc.gov.ng',
+    recipientRole: 'corper',
+    subject: 'Batch B Stream 2 Monthly Clearance & Biometrics Schedule',
+    content: 'All Corps members in Month 10 of service are required to submit supervisor clearance slips to their designated LGI before Friday.',
+    channel: 'both',
+    sentAt: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(),
+    read: true
+  }
+];
+
+export const INITIAL_SOCIAL_HANDLES: SocialHandles = {
+  email: 'anashasamuel@outlook.com',
+  whatsapp: '+2347064207685',
+  twitter: '@nysc_ng',
+  facebook: 'https://facebook.com/nyscng',
+  instagram: '@officialnyscng',
+  linkedin: 'https://linkedin.com/in/samuel-anasha',
+  telegram: 'https://t.me/nysc_ppa_support',
+  website: 'https://nysc.gov.ng'
+};
+
+export const INITIAL_SUB_ADMINS: import('../types').SubAdminUser[] = [
+  {
+    id: 'sub-01',
+    name: 'Engr. David Danladi',
+    username: 'danladi_southwest',
+    email: 'd.danladi@nysc.gov.ng',
+    password: 'Nysc@SubAdmin2026',
+    role: 'sub_admin',
+    assignedZone: 'South West Zone',
+    permissions: {
+      canManageCorpers: true,
+      canManageOrganizations: true,
+      canAuditCommittees: true,
+      canBroadcastMessages: true,
+      canManageModerators: false,
+      canDeleteRecords: false,
+      canManageSettings: false
+    },
+    createdAt: '2026-01-15T09:00:00Z',
+    status: 'active'
+  },
+  {
+    id: 'sub-02',
+    name: 'Hajia Aisha Garba',
+    username: 'aisha_northcentral',
+    email: 'a.garba@nysc.gov.ng',
+    password: 'Nysc@NorthAudit26',
+    role: 'sub_admin',
+    assignedZone: 'North Central & FCT',
+    permissions: {
+      canManageCorpers: true,
+      canManageOrganizations: true,
+      canAuditCommittees: true,
+      canBroadcastMessages: false,
+      canManageModerators: false,
+      canDeleteRecords: false,
+      canManageSettings: false
+    },
+    createdAt: '2026-02-10T11:30:00Z',
+    status: 'active'
+  }
+];
+
+export const INITIAL_MODERATORS: import('../types').ModeratorUser[] = [
+  {
+    id: 'mod-01',
+    name: 'Barrister Michael Alabi',
+    email: 'm.alabi@nysc-moderators.gov.ng',
+    phone: '+234 802 334 9910',
+    password: 'Mod@Alabi2026',
+    focusArea: 'PPA Compliance',
+    assignedState: 'Lagos',
+    activeFaultsAssigned: 2,
+    totalResolvedFaults: 14,
+    createdAt: '2026-01-20T10:00:00Z',
+    status: 'active'
+  },
+  {
+    id: 'mod-02',
+    name: 'Grace Chinwe Okeke',
+    email: 'g.okeke@nysc-moderators.gov.ng',
+    phone: '+234 813 908 1122',
+    password: 'Mod@Grace2026',
+    focusArea: 'Fault & Bug Review',
+    assignedState: 'All States',
+    activeFaultsAssigned: 1,
+    totalResolvedFaults: 23,
+    createdAt: '2026-02-01T08:00:00Z',
+    status: 'active'
+  },
+  {
+    id: 'mod-03',
+    name: 'Usman Farouk',
+    email: 'u.farouk@nysc-moderators.gov.ng',
+    phone: '+234 809 772 4410',
+    password: 'Mod@Usman2026',
+    focusArea: 'Corper Complaints',
+    assignedState: 'Abuja (FCT)',
+    activeFaultsAssigned: 1,
+    totalResolvedFaults: 9,
+    createdAt: '2026-02-15T14:00:00Z',
+    status: 'active'
+  }
+];
+
+export const INITIAL_APP_FAULTS: import('../types').AppFault[] = [
+  {
+    id: 'fault-01',
+    title: 'PPA Delayed Monthly Corper Stipend Payment for 2 Months',
+    category: 'PPA Violation / Hardship',
+    reportedBy: 'LA/24B/1042 (Chidubem Okafor)',
+    reporterRole: 'corper',
+    description: 'Establishment has withheld agreed ₦40,000 monthly allowance citing budget reconciliation.',
+    severity: 'high',
+    state: 'Lagos',
+    status: 'under_review',
+    assignedModeratorId: 'mod-01',
+    assignedModeratorName: 'Barrister Michael Alabi',
+    moderatorNotes: 'Contacted HR Manager at establishment; payment scheduled for 15th.',
+    createdAt: '2026-03-01T10:20:00Z'
+  },
+  {
+    id: 'fault-02',
+    title: 'Discrepancy in Biometric Clearance Slip Verification',
+    category: 'Bug / System Glitch',
+    reportedBy: 'LGI Ikeja Office',
+    reporterRole: 'committee',
+    description: 'System occasionally marks monthly clearance as pending after inspector signed approval.',
+    severity: 'medium',
+    state: 'Lagos',
+    status: 'resolved',
+    assignedModeratorId: 'mod-02',
+    assignedModeratorName: 'Grace Chinwe Okeke',
+    moderatorNotes: 'Resolved cache revalidation logic on clearance slip endpoint.',
+    createdAt: '2026-02-28T16:45:00Z',
+    resolvedAt: '2026-03-02T11:00:00Z'
+  },
+  {
+    id: 'fault-03',
+    title: 'Corper Lodging Lacks Potable Water and Basic Security',
+    category: 'PPA Violation / Hardship',
+    reportedBy: 'RV/24B/5012 (Emmanuel Kingsley)',
+    reporterRole: 'corper',
+    description: 'The Corpers lodge provided has no running water or security fence as committed on accredited charter.',
+    severity: 'high',
+    state: 'Rivers',
+    status: 'pending',
+    assignedModeratorId: 'mod-01',
+    assignedModeratorName: 'Barrister Michael Alabi',
+    createdAt: '2026-03-03T09:15:00Z'
+  }
+];
+
+export const INITIAL_PLACEMENT_REQUESTS: import('../types').PlacementRequest[] = [
+  {
+    id: 'req-01',
+    corperId: 'corp-01',
+    corperName: 'Chidubem Emmanuel Okafor',
+    corperStateCode: 'LA/24B/1042',
+    courseOfStudy: 'Computer Science',
+    category: 'Science & Tech',
+    ppaId: 'org-lag-01',
+    ppaName: 'Sterling Fintech Solutions Lab',
+    requestDate: '2026-02-15T08:30:00Z',
+    status: 'accepted',
+    decisionDate: '2026-02-16T10:00:00Z',
+    notes: 'Accepted based on high software engineering competence.'
+  },
+  {
+    id: 'req-02',
+    corperId: 'corp-05',
+    corperName: 'Blessing Ngozi Okonkwo',
+    corperStateCode: 'LA/24B/7721',
+    courseOfStudy: 'Information Technology & Cyber Security',
+    category: 'Science & Tech',
+    ppaId: 'org-lag-01',
+    ppaName: 'Sterling Fintech Solutions Lab',
+    requestDate: '2026-03-02T14:15:00Z',
+    status: 'pending',
+    notes: 'First class graduate with expertise in Cloud Security and React.'
+  },
+  {
+    id: 'req-03',
+    corperId: 'corp-06',
+    corperName: 'Ibrahim Faruq Usman',
+    corperStateCode: 'LA/24B/9104',
+    courseOfStudy: 'Business Administration',
+    category: 'Management & Social Sciences',
+    ppaId: 'org-lag-01',
+    ppaName: 'Sterling Fintech Solutions Lab',
+    requestDate: '2026-03-03T11:00:00Z',
+    status: 'pending',
+    notes: 'Skilled in digital product marketing and customer acquisition.'
+  },
+  {
+    id: 'req-04',
+    corperId: 'corp-07',
+    corperName: 'David Kalu Nnamdi',
+    corperStateCode: 'FC/24B/4401',
+    courseOfStudy: 'Economics & Public Policy',
+    category: 'Management & Social Sciences',
+    ppaId: 'org-fct-03',
+    ppaName: 'Apex Advisory & Management Consultants',
+    requestDate: '2026-03-01T09:00:00Z',
+    status: 'pending',
+    notes: 'Certified Data Analyst looking for advisory placement.'
+  }
+];
+
+// Generates official state committee unique login ID and credentials for all 36 Nigerian states + FCT
+export function getStateLoginCredentials(stateName: string, stateCodePrefix: string) {
+  const code = stateCodePrefix.toUpperCase();
+  const slug = stateName.toLowerCase().replace(/[^a-z]/g, '');
+  return {
+    stateName,
+    stateCode: code,
+    uniqueId: `NYSC-STATE-${code}-2026`,
+    password: `nysc@${slug}2026`,
+    coordinatorEmail: `${code.toLowerCase()}secretariat@nysc.gov.ng`,
+    coordinatorName: `State Coordinator, ${stateName} NYSC Secretariat`
+  };
+}
+
+// Helper to generate state committee detail for any of the 36 states or FCT
+export function getStateCommitteeData(stateName: string, stateCodePrefix: string): StateCommittee {
+  const existing = INITIAL_STATE_COMMITTEES.find(c => c.stateName.toLowerCase() === stateName.toLowerCase());
+  if (existing) return existing;
+
+  const creds = getStateLoginCredentials(stateName, stateCodePrefix);
+
+  return {
+    stateName,
+    stateCapital: stateName === 'Abuja (FCT)' ? 'Abuja' : `${stateName} City`,
+    stateCodePrefix,
+    stateCoordinator: creds.coordinatorName,
+    secretariatAddress: `Plot 10, State NYSC Secretariat Road, ${stateName}`,
+    hotline: '+234 803 000 0199',
+    email: creds.coordinatorEmail,
+    orientationCampLocation: `NYSC Permanent Orientation Camp, ${stateName}`,
+    activeLgis: 0,
+    totalCorpersInState: 0,
+    totalPpasRegistered: 0,
+    totalPpasOccupied: 0,
+    complianceAuditScore: 0,
+    isRegistered: false,
+    zonalOffices: []
+  };
+}
+

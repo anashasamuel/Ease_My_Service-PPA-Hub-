@@ -1,0 +1,6 @@
+{
+  "name": "Ease My NYSC - PPA Recommendation & Management Portal",
+  "description": "Comprehensive NYSC Place of Primary Assignment (PPA) matcher, organization quota tracker, Corper reviews, and State Committee LGI monitoring system across Nigeria's 36 states and FCT.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
