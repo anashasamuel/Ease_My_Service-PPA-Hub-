@@ -30,6 +30,7 @@ export interface CorperProfile {
   stateOfService: string;
   lgaOfService: string;
   courseOfStudy: string;
+  secondaryDiscipline?: string; // Optional secondary discipline accredited by Ministry of Education
   category: AcademicCategory;
   softSkills: string[];
   assignedPpaId?: string;

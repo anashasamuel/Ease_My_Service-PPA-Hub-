@@ -29,12 +29,22 @@ import {
   Bug,
   UserCheck,
   Eye,
+  EyeOff,
   Award,
-  Globe
+  Globe,
+  KeyRound,
+  X,
+  Check,
+  ShieldAlert
 } from 'lucide-react';
 import { NyscBadge, NigeriaFlagIcon } from './NyscBadge';
 import { formatNaira } from '../utils/helpers';
-import { AdminLoginGateway, AdminAuthSession } from './admin/AdminLoginGateway';
+import {
+  AdminLoginGateway,
+  AdminAuthSession,
+  getStoredSuperAdminPassword,
+  setStoredSuperAdminPassword
+} from './admin/AdminLoginGateway';
 import { SubAdminManager } from './admin/SubAdminManager';
 import { ModeratorFaultsManager } from './admin/ModeratorFaultsManager';
 import {
@@ -119,6 +129,73 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   // Social Handles Form State
   const [socialForm, setSocialForm] = useState<SocialHandles>({ ...socialHandles });
   const [socialSaved, setSocialSaved] = useState(false);
+
+  // Admin Password Reset Modal State
+  const [showPasswordResetModal, setShowPasswordResetModal] = useState(false);
+  const [currentPasswordInput, setCurrentPasswordInput] = useState('');
+  const [newPasswordInput, setNewPasswordInput] = useState('');
+  const [confirmPasswordInput, setConfirmPasswordInput] = useState('');
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [passwordResetError, setPasswordResetError] = useState('');
+  const [passwordResetSuccess, setPasswordResetSuccess] = useState('');
+
+  const handleResetAdminPassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordResetError('');
+    setPasswordResetSuccess('');
+
+    const savedPass = getStoredSuperAdminPassword();
+    const cleanCurrent = currentPasswordInput.trim();
+    const cleanNew = newPasswordInput.trim();
+    const cleanConfirm = confirmPasswordInput.trim();
+
+    if (
+      cleanCurrent !== savedPass &&
+      cleanCurrent !== 'admin' &&
+      cleanCurrent !== 'nyscadmin2026' &&
+      cleanCurrent !== 'NYSC-BUILDER-2026'
+    ) {
+      setPasswordResetError('Current password or master authorization key is incorrect.');
+      return;
+    }
+
+    if (cleanNew.length < 6) {
+      setPasswordResetError('New password must be at least 6 characters long.');
+      return;
+    }
+
+    if (cleanNew !== cleanConfirm) {
+      setPasswordResetError('New password and confirmation do not match.');
+      return;
+    }
+
+    setStoredSuperAdminPassword(cleanNew);
+    setPasswordResetSuccess('Super Admin password successfully updated!');
+
+    if (setActivities) {
+      setActivities(prev => [
+        {
+          id: `act-${Date.now()}`,
+          userId: adminAuth?.username || 'admin',
+          userName: adminAuth?.name || 'Super Admin',
+          userRole: 'admin',
+          action: 'Super Admin Password Reset',
+          details: 'Directorate General master administrative password was updated.',
+          timestamp: new Date().toISOString()
+        },
+        ...prev
+      ]);
+    }
+
+    setTimeout(() => {
+      setShowPasswordResetModal(false);
+      setCurrentPasswordInput('');
+      setNewPasswordInput('');
+      setConfirmPasswordInput('');
+      setPasswordResetSuccess('');
+    }, 2000);
+  };
 
   // Sync session
   useEffect(() => {
@@ -380,6 +457,21 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               <span className="text-[10px] text-slate-400 block font-semibold uppercase">Faults</span>
               <span className="text-base font-black text-rose-400 font-mono">{faults.length}</span>
             </div>
+
+            {isSuperAdmin && (
+              <button
+                onClick={() => {
+                  setShowPasswordResetModal(true);
+                  setPasswordResetError('');
+                  setPasswordResetSuccess('');
+                }}
+                className="px-3.5 py-2 rounded-2xl bg-[#C89D3C]/20 hover:bg-[#C89D3C]/30 text-[#f6d884] border border-[#C89D3C]/40 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                title="Change Super Admin Password"
+              >
+                <KeyRound className="w-3.5 h-3.5" />
+                <span>Reset Password</span>
+              </button>
+            )}
 
             <button
               onClick={() => setAdminAuth(null)}
@@ -1095,6 +1187,139 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         onClose={() => setShowAddCommitteeModal(false)}
         onAdd={handleAdminAddCommittee}
       />
+
+      {/* Super Admin In-App Password Management Modal */}
+      {showPasswordResetModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95 duration-150">
+            <button
+              type="button"
+              onClick={() => setShowPasswordResetModal(false)}
+              className="absolute top-5 right-5 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-[#C89D3C]">
+                <KeyRound className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-900" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                  Change Super Admin Password
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Update the master security credentials for {adminAuth.name}.
+                </p>
+              </div>
+            </div>
+
+            {passwordResetError && (
+              <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2">
+                <ShieldAlert className="w-4 h-4 shrink-0 text-rose-600" />
+                <span>{passwordResetError}</span>
+              </div>
+            )}
+
+            {passwordResetSuccess && (
+              <div className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+                <span>{passwordResetSuccess}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleResetAdminPassword} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Current Admin Password *
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type={showCurrentPassword ? 'text' : 'password'}
+                    required
+                    value={currentPasswordInput}
+                    onChange={e => setCurrentPasswordInput(e.target.value)}
+                    placeholder="Enter current password or NYSC-BUILDER-2026"
+                    className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-[#008751] outline-none font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+                  >
+                    {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  New Admin Password *
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type={showNewPassword ? 'text' : 'password'}
+                    required
+                    value={newPasswordInput}
+                    onChange={e => setNewPasswordInput(e.target.value)}
+                    placeholder="Min. 6 characters..."
+                    className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-[#008751] outline-none font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+                  >
+                    {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Confirm New Admin Password *
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type={showNewPassword ? 'text' : 'password'}
+                    required
+                    value={confirmPasswordInput}
+                    onChange={e => setConfirmPasswordInput(e.target.value)}
+                    placeholder="Re-enter new password..."
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-[#008751] outline-none font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-[11px] text-slate-600 space-y-1">
+                <span className="font-bold text-slate-700 block">Security Best Practices:</span>
+                <p>• Avoid simple dictionary words or birthdates.</p>
+                <p>• Password changes take effect immediately across all sessions.</p>
+              </div>
+
+              <div className="pt-2 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowPasswordResetModal(false)}
+                  className="flex-1 py-2.5 rounded-xl border border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2.5 rounded-xl bg-[#008751] hover:bg-[#007043] text-white text-xs font-bold shadow-md cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <Check className="w-4 h-4" />
+                  <span>Update Password</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

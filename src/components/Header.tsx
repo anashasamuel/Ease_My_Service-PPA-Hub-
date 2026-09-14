@@ -64,7 +64,9 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => setActiveTab('directory')}
             className="flex items-center gap-3 cursor-pointer group select-none"
           >
-            <NyscBadge size={44} className="group-hover:scale-105 transition-transform" />
+            <div className="p-1 rounded-xl bg-slate-50 border border-slate-200/80 shadow-xs group-hover:border-emerald-300 group-hover:bg-emerald-50/50 transition-colors shrink-0">
+              <NyscBadge size={42} className="group-hover:scale-105 transition-transform" />
+            </div>
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-900" style={{ fontFamily: "'Outfit', sans-serif" }}>

@@ -1,4 +1,4 @@
-import { StateCommittee } from '../types';
+import { StateCommittee, AcademicCategory } from '../types';
 
 export interface StateInfo {
   name: string;
@@ -326,6 +326,201 @@ export const SOFT_SKILLS_OPTIONS = [
   'UI/UX Design & User Research'
 ];
 
+export interface AcademicFacultyDef {
+  id: AcademicCategory;
+  category: AcademicCategory;
+  name: string;
+  shortName: string;
+  description: string;
+  disciplines: string[];
+}
+
+// Academic Faculties & Ministry of Education / NUC Accredited Disciplines
+export const ACCREDITED_FACULTIES: AcademicFacultyDef[] = [
+  {
+    id: 'Science & Tech',
+    category: 'Science & Tech',
+    name: 'Faculty of Science & Computing / Technology',
+    shortName: 'Science & Tech',
+    description: 'Computer Science, Software, Artificial Intelligence, Biological & Chemical Sciences',
+    disciplines: [
+      'Computer Science',
+      'Software Engineering',
+      'Information Technology',
+      'Cybersecurity',
+      'Artificial Intelligence & Robotics',
+      'Data Science & Analytics',
+      'Biochemistry',
+      'Microbiology',
+      'Biotechnology',
+      'Mathematics',
+      'Statistics',
+      'Industrial Chemistry',
+      'Pure & Applied Physics',
+      'Geology',
+      'Geophysics',
+      'Plant Biology & Biotechnology',
+      'Zoology & Environmental Biology'
+    ]
+  },
+  {
+    id: 'Engineering',
+    category: 'Engineering',
+    name: 'Faculty of Engineering & Technology',
+    shortName: 'Engineering',
+    description: 'Mechanical, Electrical, Civil, Chemical, Petroleum & Mechatronics',
+    disciplines: [
+      'Mechanical Engineering',
+      'Electrical / Electronics Engineering',
+      'Civil & Environmental Engineering',
+      'Chemical & Petroleum Engineering',
+      'Computer Engineering',
+      'Agricultural & Bio-Resources Engineering',
+      'Mechatronics Engineering',
+      'Biomedical Engineering',
+      'Materials & Metallurgical Engineering',
+      'Industrial & Production Engineering',
+      'Marine Engineering',
+      'Telecommunication Engineering'
+    ]
+  },
+  {
+    id: 'Medical & Health',
+    category: 'Medical & Health',
+    name: 'Faculty of Medical, Health & Clinical Sciences',
+    shortName: 'Medical & Health',
+    description: 'Medicine & Surgery, Nursing, Pharmacy, Medical Lab Science, Dentistry',
+    disciplines: [
+      'Medicine & Surgery (MBBS)',
+      'Nursing Science',
+      'Pharmacy (Pharm.D / B.Pharm)',
+      'Medical Laboratory Science',
+      'Physiotherapy',
+      'Radiography & Radiation Science',
+      'Dentistry (BDS)',
+      'Human Anatomy',
+      'Human Physiology',
+      'Public Health Science',
+      'Optometry (OD)',
+      'Nutrition & Dietetics',
+      'Pharmacology & Toxicology'
+    ]
+  },
+  {
+    id: 'Management & Social Sciences',
+    category: 'Management & Social Sciences',
+    name: 'Faculty of Management & Social Sciences',
+    shortName: 'Management & Social Sciences',
+    description: 'Economics, Accounting, Business Admin, Banking, Political Science, Mass Comm',
+    disciplines: [
+      'Economics',
+      'Accounting',
+      'Banking & Finance',
+      'Business Administration',
+      'Marketing',
+      'Mass Communication',
+      'Political Science',
+      'Public Administration',
+      'Sociology',
+      'Psychology',
+      'International Relations',
+      'Industrial Relations & Personnel Management',
+      'Criminology & Security Studies',
+      'Insurance & Actuarial Science'
+    ]
+  },
+  {
+    id: 'Arts & Humanities',
+    category: 'Arts & Humanities',
+    name: 'Faculty of Arts & Humanities',
+    shortName: 'Arts & Humanities',
+    description: 'English, Linguistics, History, Philosophy, Modern Languages, Performing Arts',
+    disciplines: [
+      'English & Literary Studies',
+      'Linguistics & Nigerian Languages',
+      'History & International Studies',
+      'Philosophy',
+      'Theatre & Performing Arts',
+      'French & Modern European Languages',
+      'Religious Studies',
+      'Music',
+      'Fine & Applied Arts'
+    ]
+  },
+  {
+    id: 'Education',
+    category: 'Education',
+    name: 'Faculty of Education',
+    shortName: 'Education',
+    description: 'Education Science, Educational Management, Guidance, Curriculum Studies',
+    disciplines: [
+      'Education & Biology',
+      'Education & Mathematics',
+      'Education & Chemistry',
+      'Education & Physics',
+      'Education & English',
+      'Education & Economics',
+      'Education & Computer Science',
+      'Educational Management & Planning',
+      'Guidance & Counselling',
+      'Early Childhood Education',
+      'Adult & Non-Formal Education',
+      'Business Education',
+      'Agricultural Education',
+      'Physical & Health Education'
+    ]
+  },
+  {
+    id: 'Agriculture',
+    category: 'Agriculture',
+    name: 'Faculty of Agriculture & Agro-Allied',
+    shortName: 'Agriculture',
+    description: 'Agronomy, Animal Science, Agricultural Economics, Fisheries & Food Science',
+    disciplines: [
+      'Agricultural Science',
+      'Agronomy & Crop Production',
+      'Animal Science & Husbandry',
+      'Fisheries & Aquaculture',
+      'Agricultural Economics & Extension',
+      'Soil Science & Land Management',
+      'Food Science & Technology',
+      'Forestry & Wildlife Management'
+    ]
+  },
+  {
+    id: 'Law',
+    category: 'Law',
+    name: 'Faculty of Law',
+    shortName: 'Law',
+    description: 'Common Law, Commercial Law, Public Law, Jurisprudence',
+    disciplines: [
+      'Law (LL.B)',
+      'Common & Islamic Law',
+      'Commercial & Corporate Law',
+      'Public & International Law',
+      'Jurisprudence & Legal Theory'
+    ]
+  },
+  {
+    id: 'Environmental Sciences',
+    category: 'Environmental Sciences',
+    name: 'Faculty of Environmental Sciences & Design',
+    shortName: 'Environmental Sciences',
+    description: 'Architecture, Estate Management, Quantity Surveying, Urban & Regional Planning',
+    disciplines: [
+      'Architecture',
+      'Estate Management',
+      'Quantity Surveying',
+      'Urban & Regional Planning',
+      'Building Technology',
+      'Surveying & Geoinformatics'
+    ]
+  }
+];
+
+// Flat list of all accredited disciplines
+export const ALL_ACCREDITED_DISCIPLINES: string[] = ACCREDITED_FACULTIES.flatMap(f => f.disciplines);
+
 export const COURSE_CATEGORIES: Record<string, { category: string; preferredSectors: string[]; defaultDisciplines: string[] }> = {
   'Computer Science': {
     category: 'Science & Tech',
@@ -336,6 +531,26 @@ export const COURSE_CATEGORIES: Record<string, { category: string; preferredSect
     category: 'Science & Tech',
     preferredSectors: ['Information Technology & Software', 'Banking & Financial Services'],
     defaultDisciplines: ['Software Engineering', 'Computer Science']
+  },
+  'Information Technology': {
+    category: 'Science & Tech',
+    preferredSectors: ['Information Technology & Software', 'Banking & Financial Services', 'Government Ministry / Parastatal'],
+    defaultDisciplines: ['Information Technology', 'Computer Science']
+  },
+  'Cybersecurity': {
+    category: 'Science & Tech',
+    preferredSectors: ['Information Technology & Software', 'Banking & Financial Services', 'Government Ministry / Parastatal'],
+    defaultDisciplines: ['Cybersecurity', 'Computer Science']
+  },
+  'Artificial Intelligence & Robotics': {
+    category: 'Science & Tech',
+    preferredSectors: ['Information Technology & Software', 'Banking & Financial Services'],
+    defaultDisciplines: ['Artificial Intelligence', 'Data Science', 'Robotics']
+  },
+  'Data Science & Analytics': {
+    category: 'Science & Tech',
+    preferredSectors: ['Information Technology & Software', 'Banking & Financial Services', 'Government Ministry / Parastatal'],
+    defaultDisciplines: ['Data Science', 'Statistics', 'Computer Science']
   },
   'Accounting': {
     category: 'Management & Social Sciences',
@@ -352,6 +567,11 @@ export const COURSE_CATEGORIES: Record<string, { category: string; preferredSect
     preferredSectors: ['Manufacturing & FMCG', 'Banking & Financial Services', 'Information Technology & Software'],
     defaultDisciplines: ['Business Administration', 'Marketing', 'Public Admin']
   },
+  'Banking & Finance': {
+    category: 'Management & Social Sciences',
+    preferredSectors: ['Banking & Financial Services', 'Government Ministry / Parastatal'],
+    defaultDisciplines: ['Banking & Finance', 'Accounting', 'Economics']
+  },
   'Medicine & Surgery (MBBS)': {
     category: 'Medical & Health',
     preferredSectors: ['Healthcare & Hospital'],
@@ -362,15 +582,25 @@ export const COURSE_CATEGORIES: Record<string, { category: string; preferredSect
     preferredSectors: ['Healthcare & Hospital'],
     defaultDisciplines: ['Nursing', 'Community Health']
   },
-  'Pharmacy': {
+  'Pharmacy (Pharm.D / B.Pharm)': {
     category: 'Medical & Health',
     preferredSectors: ['Healthcare & Hospital', 'Manufacturing & FMCG'],
     defaultDisciplines: ['Pharmacy', 'Pharmacology']
+  },
+  'Medical Laboratory Science': {
+    category: 'Medical & Health',
+    preferredSectors: ['Healthcare & Hospital', 'Manufacturing & FMCG'],
+    defaultDisciplines: ['Medical Laboratory Science', 'Microbiology']
   },
   'Biochemistry': {
     category: 'Science & Tech',
     preferredSectors: ['Healthcare & Hospital', 'Manufacturing & FMCG', 'Education (Secondary/College)'],
     defaultDisciplines: ['Biochemistry', 'Microbiology', 'Chemistry']
+  },
+  'Microbiology': {
+    category: 'Science & Tech',
+    preferredSectors: ['Healthcare & Hospital', 'Manufacturing & FMCG', 'Education (Secondary/College)'],
+    defaultDisciplines: ['Microbiology', 'Biochemistry']
   },
   'Electrical / Electronics Engineering': {
     category: 'Engineering',
@@ -382,10 +612,15 @@ export const COURSE_CATEGORIES: Record<string, { category: string; preferredSect
     preferredSectors: ['Engineering & Construction', 'Manufacturing & FMCG', 'Agriculture & Agro-allied'],
     defaultDisciplines: ['Mechanical Engineering', 'Mechatronics', 'Production Engineering']
   },
-  'Civil Engineering': {
+  'Civil & Environmental Engineering': {
     category: 'Engineering',
     preferredSectors: ['Engineering & Construction', 'Government Ministry / Parastatal'],
     defaultDisciplines: ['Civil Engineering', 'Building Technology', 'Surveying']
+  },
+  'Chemical & Petroleum Engineering': {
+    category: 'Engineering',
+    preferredSectors: ['Engineering & Construction', 'Manufacturing & FMCG'],
+    defaultDisciplines: ['Chemical Engineering', 'Petroleum Engineering']
   },
   'Law (LL.B)': {
     category: 'Law',
@@ -393,16 +628,16 @@ export const COURSE_CATEGORIES: Record<string, { category: string; preferredSect
     defaultDisciplines: ['Law', 'Jurisprudence', 'Commercial Law']
   },
   'Mass Communication': {
-    category: 'Arts & Humanities',
+    category: 'Management & Social Sciences',
     preferredSectors: ['Media & Communications', 'Information Technology & Software', 'Education (Secondary/College)'],
     defaultDisciplines: ['Mass Communication', 'Journalism', 'Public Relations']
   },
   'English & Literary Studies': {
-    category: 'Education',
+    category: 'Arts & Humanities',
     preferredSectors: ['Education (Secondary/College)', 'Media & Communications'],
     defaultDisciplines: ['English', 'Literature', 'Linguistics', 'Education']
   },
-  'Mathematics / Statistics': {
+  'Mathematics': {
     category: 'Science & Tech',
     preferredSectors: ['Banking & Financial Services', 'Information Technology & Software', 'Education (Secondary/College)'],
     defaultDisciplines: ['Mathematics', 'Statistics', 'Actuarial Science']
@@ -411,21 +646,85 @@ export const COURSE_CATEGORIES: Record<string, { category: string; preferredSect
     category: 'Agriculture',
     preferredSectors: ['Agriculture & Agro-allied', 'Government Ministry / Parastatal', 'Education (Secondary/College)'],
     defaultDisciplines: ['Agricultural Economics', 'Agronomy', 'Animal Science']
+  },
+  'Architecture': {
+    category: 'Environmental Sciences',
+    preferredSectors: ['Engineering & Construction', 'Government Ministry / Parastatal'],
+    defaultDisciplines: ['Architecture', 'Urban Planning', 'Building Technology']
+  },
+  'Estate Management': {
+    category: 'Environmental Sciences',
+    preferredSectors: ['Engineering & Construction', 'Banking & Financial Services'],
+    defaultDisciplines: ['Estate Management', 'Quantity Surveying']
+  },
+  'Quantity Surveying': {
+    category: 'Environmental Sciences',
+    preferredSectors: ['Engineering & Construction', 'Government Ministry / Parastatal'],
+    defaultDisciplines: ['Quantity Surveying', 'Civil Engineering', 'Building Technology']
   }
 };
 
-export const NYSC_BATCH_OPTIONS = [
-  '2024 Batch A Stream 1',
-  '2024 Batch A Stream 2',
-  '2024 Batch B Stream 1',
-  '2024 Batch B Stream 2',
-  '2024 Batch C Stream 1',
-  '2024 Batch C Stream 2',
-  '2025 Batch A Stream 1',
-  '2025 Batch A Stream 2',
-  '2025 Batch B Stream 1',
-  '2025 Batch B Stream 2'
+// Official NYSC Mobilization Pattern: 3 Batches (A, B, C) x 2 Streams (Stream 1 & Stream 2) per service year
+export const NYSC_MOBILIZATION_GROUPS: { year: string; group: string; batches: string[] }[] = [
+  {
+    year: '2026 Mobilization Year',
+    group: '2026 Mobilization Year',
+    batches: [
+      '2026 Batch C Stream 2',
+      '2026 Batch C Stream 1',
+      '2026 Batch B Stream 2',
+      '2026 Batch B Stream 1',
+      '2026 Batch A Stream 2',
+      '2026 Batch A Stream 1'
+    ]
+  },
+  {
+    year: '2025 Mobilization Year',
+    group: '2025 Mobilization Year',
+    batches: [
+      '2025 Batch C Stream 2',
+      '2025 Batch C Stream 1',
+      '2025 Batch B Stream 2',
+      '2025 Batch B Stream 1',
+      '2025 Batch A Stream 2',
+      '2025 Batch A Stream 1'
+    ]
+  },
+  {
+    year: '2024 Mobilization Year',
+    group: '2024 Mobilization Year',
+    batches: [
+      '2024 Batch C Stream 2',
+      '2024 Batch C Stream 1',
+      '2024 Batch B Stream 2',
+      '2024 Batch B Stream 1',
+      '2024 Batch A Stream 2',
+      '2024 Batch A Stream 1'
+    ]
+  },
+  {
+    year: '2023 Mobilization Year',
+    group: '2023 Mobilization Year',
+    batches: [
+      '2023 Batch C Stream 2',
+      '2023 Batch C Stream 1',
+      '2023 Batch B Stream 2',
+      '2023 Batch B Stream 1',
+      '2023 Batch A Stream 2',
+      '2023 Batch A Stream 1'
+    ]
+  },
+  {
+    year: 'Concessional & Remobilization',
+    group: 'Concessional & Remobilization',
+    batches: [
+      'Special Concessional / Foreign Graduate Stream',
+      'Remobilization Stream'
+    ]
+  }
 ];
+
+export const NYSC_BATCH_OPTIONS = NYSC_MOBILIZATION_GROUPS.flatMap(g => g.batches);
 
 export const PRIMARY_SECTOR_OPTIONS = [
   'Education (Secondary/College)',
@@ -440,42 +739,6 @@ export const PRIMARY_SECTOR_OPTIONS = [
   'Manufacturing & FMCG'
 ];
 
-export const POPULAR_COURSES = [
-  'Computer Science',
-  'Software Engineering',
-  'Information Technology',
-  'Cybersecurity',
-  'Electrical / Electronics Engineering',
-  'Mechanical Engineering',
-  'Civil Engineering',
-  'Chemical Engineering',
-  'Medicine & Surgery (MBBS)',
-  'Nursing Science',
-  'Pharmacy',
-  'Medical Laboratory Science',
-  'Biochemistry',
-  'Microbiology',
-  'Accounting',
-  'Economics',
-  'Business Administration',
-  'Banking & Finance',
-  'Marketing',
-  'Mass Communication',
-  'Law (LL.B)',
-  'Political Science',
-  'Public Administration',
-  'Agricultural Science',
-  'Animal Science & Fisheries',
-  'Food Science & Technology',
-  'English & Literary Studies',
-  'Mathematics / Statistics',
-  'Physics',
-  'Chemistry',
-  'Architecture',
-  'Estate Management',
-  'Quantity Surveying',
-  'Sociology',
-  'Education & Biology',
-  'Education & Mathematics'
-];
+export const POPULAR_COURSES = ALL_ACCREDITED_DISCIPLINES;
+
 

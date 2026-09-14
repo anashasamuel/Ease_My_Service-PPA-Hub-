@@ -11,6 +11,9 @@ import {
   SOFT_SKILLS_OPTIONS,
   COURSE_CATEGORIES,
   NYSC_BATCH_OPTIONS,
+  NYSC_MOBILIZATION_GROUPS,
+  ACCREDITED_FACULTIES,
+  ALL_ACCREDITED_DISCIPLINES,
   POPULAR_COURSES
 } from '../data/nigeriaStates';
 import { calculateMatchScore, formatNaira } from '../utils/helpers';
@@ -42,7 +45,8 @@ import {
   Camera,
   Upload,
   UserPlus,
-  Lock
+  Lock,
+  RotateCcw
 } from 'lucide-react';
 import { NyscBadge } from './NyscBadge';
 import { RegisterCorperModal } from './RegisterCorperModal';
@@ -77,6 +81,8 @@ export const CorperDashboard: React.FC<CorperDashboardProps> = ({
   const [accommodationFilter, setAccommodationFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [stateFilter, setStateFilter] = useState(corper.stateOfService);
+  const [lgaFilter, setLgaFilter] = useState<string>('all');
+  const [facultyFilter, setFacultyFilter] = useState<string>('all');
   const [courseMode, setCourseMode] = useState<'dropdown' | 'manual'>('dropdown');
 
   // Modals
@@ -218,28 +224,65 @@ export const CorperDashboard: React.FC<CorperDashboardProps> = ({
     .filter(org => {
       // Search
       const matchesSearch =
+        searchQuery.trim() === '' ||
         org.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         org.sector.toLowerCase().includes(searchQuery.toLowerCase()) ||
         org.lga.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        org.departments.some(d => d.toLowerCase().includes(searchQuery.toLowerCase()));
+        org.departments.some(d => d.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (org.preferredDisciplines && org.preferredDisciplines.some(p => p.toLowerCase().includes(searchQuery.toLowerCase())));
 
-      // State
-      const matchesState = stateFilter === 'all' || org.state.toLowerCase() === stateFilter.toLowerCase();
+      // State matching (All 36 States+ FCT)
+      const orgStateNorm = org.state.toLowerCase().trim();
+      const filterStateNorm = stateFilter.toLowerCase().trim();
+      const matchesState =
+        stateFilter === 'all' ||
+        orgStateNorm === filterStateNorm ||
+        (filterStateNorm.includes('abuja') && (orgStateNorm.includes('abuja') || orgStateNorm.includes('fct'))) ||
+        (filterStateNorm.includes('fct') && (orgStateNorm.includes('abuja') || orgStateNorm.includes('fct')));
 
-      // Availability status
+      // LGA of Primary Assignment Possibilities matching
+      const matchesLga =
+        lgaFilter === 'all' ||
+        org.lga.toLowerCase().trim() === lgaFilter.toLowerCase().trim();
+
+      // Academic Faculty / Discipline Category filter
+      let matchesFaculty = true;
+      if (facultyFilter !== 'all') {
+        const facObj = ACCREDITED_FACULTIES.find(f => f.category === facultyFilter);
+        const facDisciplines = facObj ? facObj.disciplines.map(d => d.toLowerCase()) : [];
+        const orgPrefers = (org.preferredDisciplines || []).map(p => p.toLowerCase());
+        const orgSector = org.sector.toLowerCase();
+        
+        matchesFaculty =
+          orgPrefers.some(p => facDisciplines.some(fd => fd.includes(p) || p.includes(fd))) ||
+          (facultyFilter === 'Science & Tech' && (orgSector.includes('tech') || orgSector.includes('telecom') || orgSector.includes('data') || orgSector.includes('software'))) ||
+          (facultyFilter === 'Engineering' && (orgSector.includes('eng') || orgSector.includes('energy') || orgSector.includes('oil') || orgSector.includes('construct') || orgSector.includes('power'))) ||
+          (facultyFilter === 'Medical & Health' && (orgSector.includes('health') || orgSector.includes('medic') || orgSector.includes('hospital') || orgSector.includes('pharm') || orgSector.includes('clinic'))) ||
+          (facultyFilter === 'Management & Social Sciences' && (orgSector.includes('bank') || orgSector.includes('financ') || orgSector.includes('consult') || orgSector.includes('insur') || orgSector.includes('commerce') || orgSector.includes('revenue') || orgSector.includes('tax'))) ||
+          (facultyFilter === 'Education' && (orgSector.includes('educ') || orgSector.includes('school') || orgSector.includes('acad') || orgSector.includes('teach') || orgSector.includes('college'))) ||
+          (facultyFilter === 'Agriculture' && (orgSector.includes('agri') || orgSector.includes('farm') || orgSector.includes('food') || orgSector.includes('vet'))) ||
+          (facultyFilter === 'Law' && (orgSector.includes('law') || orgSector.includes('legal') || orgSector.includes('judic') || orgSector.includes('ministry of justice'))) ||
+          (facultyFilter === 'Arts & Humanities' && (orgSector.includes('media') || orgSector.includes('comm') || orgSector.includes('arts') || orgSector.includes('journal') || orgSector.includes('broadcast') || orgSector.includes('culture'))) ||
+          (facultyFilter === 'Environmental Sciences' && (orgSector.includes('env') || orgSector.includes('urban') || orgSector.includes('geo') || orgSector.includes('survey') || orgSector.includes('housing')));
+      }
+
+      // Availability status (All Availability: open & occupied)
       const matchesStatus =
         statusFilter === 'all' ||
         (statusFilter === 'available' && !org.isOccupied) ||
         (statusFilter === 'occupied' && org.isOccupied);
 
-      // Accommodation
+      // Accommodation (Any Accomodation)
+      const orgAccom = (org.accommodation || '').toLowerCase();
+      const orgOffered = (org.accommodationOffered || '').toLowerCase();
       const matchesAccom =
         accommodationFilter === 'all' ||
-        (accommodationFilter === 'provided' && org.accommodation.includes('Provided')) ||
-        (accommodationFilter === 'subsidized' && org.accommodation.includes('Subsidized')) ||
-        (accommodationFilter === 'none' && org.accommodation.includes('None'));
+        (accommodationFilter === 'provided' && (orgAccom.includes('provided') || orgAccom.includes('lodge') || orgAccom.includes('free') || orgOffered === 'yes')) ||
+        (accommodationFilter === 'subsidized' && orgAccom.includes('subsidized')) ||
+        (accommodationFilter === 'allowance' && (orgAccom.includes('allowance') || orgAccom.includes('transport'))) ||
+        (accommodationFilter === 'none' && (orgAccom.includes('none') || orgAccom === '' || orgOffered === 'no'));
 
-      return matchesSearch && matchesState && matchesStatus && matchesAccom;
+      return matchesSearch && matchesState && matchesLga && matchesFaculty && matchesStatus && matchesAccom;
     })
     .sort((a, b) => {
       if (ignoreCourseMatching) {
@@ -358,7 +401,7 @@ export const CorperDashboard: React.FC<CorperDashboardProps> = ({
                   <span>•</span>
                   <span className="flex items-center gap-1">
                     <MapPin className="w-3.5 h-3.5 text-[#f6d884]" />
-                    {corper.stateOfService} State
+                    {corper.lgaOfService ? `${corper.lgaOfService} LGA, ` : ''}{corper.stateOfService} State
                   </span>
                 </div>
               </div>
@@ -402,39 +445,55 @@ export const CorperDashboard: React.FC<CorperDashboardProps> = ({
         </div>
 
         {/* Profile Details Bar */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-5 bg-slate-50 border-t border-slate-100 text-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 p-5 bg-slate-50 border-t border-slate-100 text-xs">
           <div>
             <span className="text-slate-500 font-semibold block uppercase tracking-wider text-[10px]">Course of Study</span>
-            <span className="font-bold text-slate-800 text-sm flex items-center gap-1.5 mt-0.5">
-              <GraduationCap className="w-4 h-4 text-[#008751]" />
-              {corper.courseOfStudy}
+            <span className="font-bold text-slate-800 text-xs flex items-center gap-1.5 mt-0.5">
+              <GraduationCap className="w-4 h-4 text-[#008751] shrink-0" />
+              <span className="truncate" title={corper.courseOfStudy}>{corper.courseOfStudy}</span>
+            </span>
+            {corper.secondaryDiscipline && (
+              <span className="text-[10px] text-emerald-700 font-semibold block mt-0.5 truncate" title={`Secondary: ${corper.secondaryDiscipline}`}>
+                + {corper.secondaryDiscipline} (2nd Disc)
+              </span>
+            )}
+          </div>
+
+          <div>
+            <span className="text-slate-500 font-semibold block uppercase tracking-wider text-[10px]">Academic Faculty</span>
+            <span className="font-semibold text-slate-800 mt-0.5 block truncate" title={corper.category}>
+              {corper.category}
             </span>
           </div>
 
           <div>
-            <span className="text-slate-500 font-semibold block uppercase tracking-wider text-[10px]">Academic Category</span>
-            <span className="font-semibold text-slate-700 mt-0.5 block">{corper.category}</span>
+            <span className="text-slate-500 font-semibold block uppercase tracking-wider text-[10px]">LGA of Primary Assignment</span>
+            <span className="font-bold text-slate-800 text-xs flex items-center gap-1 mt-0.5">
+              <MapPin className="w-3.5 h-3.5 text-[#008751] shrink-0" />
+              <span>{corper.lgaOfService || 'Assigned Council'} LGA</span>
+            </span>
+            <span className="text-[10px] text-slate-500 block">{corper.stateOfService} State</span>
           </div>
 
           <div>
             <span className="text-slate-500 font-semibold block uppercase tracking-wider text-[10px]">Assigned PPA Status</span>
             {assignedOrganization ? (
-              <div className="flex items-center gap-2 mt-0.5">
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[11px]">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                  {assignedOrganization.name}
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[11px] truncate">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
+                  <span className="truncate">{assignedOrganization.name}</span>
                 </span>
                 <button
                   onClick={() => setSelectedPpaForLetter(assignedOrganization)}
-                  className="text-emerald-700 underline text-[11px] font-semibold hover:text-emerald-900 cursor-pointer"
+                  className="text-emerald-700 underline text-[10px] font-semibold hover:text-emerald-900 cursor-pointer shrink-0"
                 >
-                  View Posting Letter
+                  Letter
                 </button>
               </div>
             ) : (
               <span className="inline-flex items-center gap-1 text-amber-700 font-semibold mt-0.5">
                 <Clock className="w-3.5 h-3.5" />
-                Seeking PPA Placement
+                Seeking Placement
               </span>
             )}
           </div>
@@ -524,62 +583,231 @@ export const CorperDashboard: React.FC<CorperDashboardProps> = ({
         </div>
 
         {/* Filter Controls Bar */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 pt-4">
           {/* Search box */}
           <div className="relative">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
             <input
               type="text"
-              placeholder="Search by PPA name, LGA, or sector..."
+              placeholder="Search PPA, LGA, sector..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-[#008751] focus:bg-white outline-none"
             />
           </div>
 
-          {/* State of Service filter */}
+          {/* State of Service filter: All 36 States+ FCT */}
           <div>
             <select
               value={stateFilter}
-              onChange={e => setStateFilter(e.target.value)}
+              onChange={e => {
+                const newState = e.target.value;
+                setStateFilter(newState);
+                setLgaFilter('all');
+              }}
               className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-[#008751] focus:bg-white outline-none cursor-pointer"
             >
-              <option value="all">All 36 States + FCT</option>
+              <option value="all">All 36 States+ FCT</option>
               {NIGERIAN_STATES.map(s => (
                 <option key={s.code} value={s.name}>
-                  {s.name} State {s.name === corper.stateOfService ? '(Your State of Service)' : ''}
+                  {s.name.includes('FCT') ? s.name : `${s.name} State`} {s.name === corper.stateOfService ? '(Your State)' : ''}
                 </option>
               ))}
             </select>
           </div>
 
-          {/* Quota Availability Filter */}
+          {/* LGA of Primary Assignment Possibilities filter */}
+          <div>
+            <select
+              value={lgaFilter}
+              onChange={e => setLgaFilter(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-[#008751] focus:bg-white outline-none cursor-pointer"
+            >
+              {stateFilter !== 'all' ? (
+                <>
+                  <option value="all">
+                    All LGAs in {stateFilter} ({(NIGERIAN_STATES.find(s => s.name === stateFilter)?.lgas || []).length} LGAs)
+                  </option>
+                  {(NIGERIAN_STATES.find(s => s.name === stateFilter)?.lgas || []).map(lga => (
+                    <option key={lga} value={lga}>
+                      {lga} LGA
+                    </option>
+                  ))}
+                </>
+              ) : (
+                <>
+                  <option value="all">All LGAs across Nigeria</option>
+                  {Array.from(new Set(organizations.map(o => o.lga))).sort().map(lga => (
+                    <option key={lga} value={lga}>
+                      {lga} LGA
+                    </option>
+                  ))}
+                </>
+              )}
+            </select>
+          </div>
+
+          {/* Academic Faculty / Discipline Category optional drop_down */}
+          <div>
+            <select
+              value={facultyFilter}
+              onChange={e => setFacultyFilter(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-[#008751] focus:bg-white outline-none cursor-pointer"
+            >
+              <option value="all">All Academic Faculties & Disciplines</option>
+              {ACCREDITED_FACULTIES.map(fac => (
+                <option key={fac.category} value={fac.category}>
+                  {fac.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Availability Filter: All Availability (open & occupied) */}
           <div>
             <select
               value={statusFilter}
               onChange={e => setStatusFilter(e.target.value as any)}
               className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-[#008751] focus:bg-white outline-none cursor-pointer"
             >
-              <option value="all">All Quota Status (Available & Occupied)</option>
-              <option value="available">🟢 Available Slots Only (Open)</option>
-              <option value="occupied">🔴 Occupied / Quota Met (Unavailable)</option>
+              <option value="all">All Availability (open & occupied)</option>
+              <option value="available">🟢 Open Slots Only (Available)</option>
+              <option value="occupied">🔴 Fully Occupied (Quota Met)</option>
             </select>
           </div>
 
-          {/* Accommodation Filter */}
+          {/* Accommodation Filter: Any Accomodation */}
           <div>
             <select
               value={accommodationFilter}
               onChange={e => setAccommodationFilter(e.target.value)}
               className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-[#008751] focus:bg-white outline-none cursor-pointer"
             >
-              <option value="all">Any Accommodation Type</option>
+              <option value="all">Any Accomodation</option>
               <option value="provided">Free Corpers Lodge Provided</option>
               <option value="subsidized">Subsidized Housing</option>
-              <option value="none">Transport Allowance / None</option>
+              <option value="allowance">Transport / Housing Allowance</option>
+              <option value="none">None / No Accommodation</option>
             </select>
           </div>
         </div>
+
+        {/* Active Filter Chips Bar */}
+        {(searchQuery.trim() !== '' || stateFilter !== 'all' || lgaFilter !== 'all' || facultyFilter !== 'all' || statusFilter !== 'all' || accommodationFilter !== 'all') && (
+          <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center gap-2 text-xs">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Active Filters:</span>
+            {stateFilter !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 font-bold border border-emerald-200">
+                <MapPin className="w-3 h-3 text-emerald-600" />
+                <span>State: {stateFilter}</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStateFilter('all');
+                    setLgaFilter('all');
+                  }}
+                  className="hover:text-emerald-950 p-0.5 cursor-pointer"
+                  title="Remove state filter"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+            {lgaFilter !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-teal-50 text-teal-900 font-bold border border-teal-200">
+                <MapPin className="w-3 h-3 text-teal-600" />
+                <span>LGA: {lgaFilter}</span>
+                <button
+                  type="button"
+                  onClick={() => setLgaFilter('all')}
+                  className="hover:text-teal-950 p-0.5 cursor-pointer"
+                  title="Remove LGA filter"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+            {facultyFilter !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-900 font-bold border border-indigo-200">
+                <GraduationCap className="w-3 h-3 text-indigo-600" />
+                <span>Faculty: {facultyFilter}</span>
+                <button
+                  type="button"
+                  onClick={() => setFacultyFilter('all')}
+                  className="hover:text-indigo-950 p-0.5 cursor-pointer"
+                  title="Remove faculty filter"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+            {statusFilter !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-800 font-bold border border-blue-200">
+                <CheckCircle2 className="w-3 h-3 text-blue-600" />
+                <span>Availability: {statusFilter === 'available' ? 'Open Slots Only' : 'Fully Occupied'}</span>
+                <button
+                  type="button"
+                  onClick={() => setStatusFilter('all')}
+                  className="hover:text-blue-950 p-0.5 cursor-pointer"
+                  title="Remove availability filter"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+            {accommodationFilter !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-900 font-bold border border-amber-200">
+                <Home className="w-3 h-3 text-amber-600" />
+                <span>
+                  Accommodation:{' '}
+                  {accommodationFilter === 'provided'
+                    ? 'Free Lodge'
+                    : accommodationFilter === 'subsidized'
+                    ? 'Subsidized'
+                    : accommodationFilter === 'allowance'
+                    ? 'Allowance'
+                    : 'None'}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setAccommodationFilter('all')}
+                  className="hover:text-amber-950 p-0.5 cursor-pointer"
+                  title="Remove accommodation filter"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+            {searchQuery.trim() !== '' && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 font-bold border border-slate-200">
+                <Search className="w-3 h-3 text-slate-500" />
+                <span>Keyword: "{searchQuery}"</span>
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="hover:text-slate-950 p-0.5 cursor-pointer"
+                  title="Clear search"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+            <button
+              onClick={() => {
+                setSearchQuery('');
+                setStateFilter('all');
+                setLgaFilter('all');
+                setFacultyFilter('all');
+                setStatusFilter('all');
+                setAccommodationFilter('all');
+              }}
+              className="text-xs text-rose-600 hover:text-rose-700 font-bold flex items-center gap-1 cursor-pointer ml-auto bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-200"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>Reset Filters</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* PPA Recommendations Grid */}
@@ -959,18 +1187,74 @@ export const CorperDashboard: React.FC<CorperDashboardProps> = ({
                   <label className="block font-bold text-slate-700 mb-1">State of Service (36 States + FCT)</label>
                   <select
                     value={profileForm.stateOfService}
-                    onChange={e => setProfileForm({ ...profileForm, stateOfService: e.target.value })}
+                    onChange={e => {
+                      const newState = e.target.value;
+                      const stateObj = NIGERIAN_STATES.find(s => s.name === newState);
+                      const defaultLga = stateObj && stateObj.lgas.length > 0 ? stateObj.lgas[0] : '';
+                      setProfileForm({
+                        ...profileForm,
+                        stateOfService: newState,
+                        lgaOfService: stateObj?.lgas.includes(profileForm.lgaOfService || '') ? profileForm.lgaOfService : defaultLga
+                      });
+                    }}
                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-[#008751] outline-none cursor-pointer"
                   >
                     {NIGERIAN_STATES.map(s => (
-                      <option key={s.code} value={s.name}>{s.name} State</option>
+                      <option key={s.code} value={s.name}>
+                        {s.name.includes('FCT') ? s.name : `${s.name} State`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    LGA of Primary Assignment ({(NIGERIAN_STATES.find(s => s.name === profileForm.stateOfService)?.lgas || []).length} LGAs in {profileForm.stateOfService})
+                  </label>
+                  <select
+                    value={profileForm.lgaOfService || (NIGERIAN_STATES.find(s => s.name === profileForm.stateOfService)?.lgas[0] || '')}
+                    onChange={e => setProfileForm({ ...profileForm, lgaOfService: e.target.value })}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-[#008751] outline-none cursor-pointer"
+                  >
+                    {(NIGERIAN_STATES.find(s => s.name === profileForm.stateOfService)?.lgas || []).map(lga => (
+                      <option key={lga} value={lga}>
+                        {lga} Local Government Area
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Academic Faculty / Discipline Category
+                  </label>
+                  <select
+                    value={profileForm.category}
+                    onChange={e => {
+                      const newCategory = e.target.value as AcademicCategory;
+                      const facObj = ACCREDITED_FACULTIES.find(f => f.category === newCategory);
+                      const defaultCourse = facObj && facObj.disciplines.length > 0 ? facObj.disciplines[0] : profileForm.courseOfStudy;
+                      setProfileForm({
+                        ...profileForm,
+                        category: newCategory,
+                        courseOfStudy: defaultCourse
+                      });
+                    }}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-[#008751] outline-none cursor-pointer"
+                  >
+                    {ACCREDITED_FACULTIES.map(fac => (
+                      <option key={fac.category} value={fac.category}>
+                        {fac.name}
+                      </option>
                     ))}
                   </select>
                 </div>
 
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="font-bold text-slate-700">Course of Study *</label>
+                    <label className="font-bold text-slate-700">Course of Study / Academic Discipline *</label>
                     <button
                       type="button"
                       onClick={() => setCourseMode(m => m === 'dropdown' ? 'manual' : 'dropdown')}
@@ -984,12 +1268,13 @@ export const CorperDashboard: React.FC<CorperDashboardProps> = ({
                       value={profileForm.courseOfStudy}
                       onChange={e => {
                         const val = e.target.value;
-                        const cat = COURSE_CATEGORIES[val]?.category || profileForm.category;
+                        const foundFac = ACCREDITED_FACULTIES.find(f => f.disciplines.includes(val));
+                        const cat = foundFac ? foundFac.category : (COURSE_CATEGORIES[val]?.category || profileForm.category);
                         setProfileForm({ ...profileForm, courseOfStudy: val, category: cat as AcademicCategory });
                       }}
                       className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-[#008751] outline-none cursor-pointer"
                     >
-                      {POPULAR_COURSES.map(c => (
+                      {(ACCREDITED_FACULTIES.find(f => f.category === profileForm.category)?.disciplines || ALL_ACCREDITED_DISCIPLINES).map(c => (
                         <option key={c} value={c}>{c}</option>
                       ))}
                     </select>
@@ -1000,7 +1285,8 @@ export const CorperDashboard: React.FC<CorperDashboardProps> = ({
                       value={profileForm.courseOfStudy}
                       onChange={e => {
                         const val = e.target.value;
-                        const cat = COURSE_CATEGORIES[val]?.category || profileForm.category;
+                        const foundFac = ACCREDITED_FACULTIES.find(f => f.disciplines.includes(val));
+                        const cat = foundFac ? foundFac.category : (COURSE_CATEGORIES[val]?.category || profileForm.category);
                         setProfileForm({ ...profileForm, courseOfStudy: val, category: cat as AcademicCategory });
                       }}
                       placeholder="e.g. Computer Science, Accounting, Medicine..."
@@ -1008,6 +1294,28 @@ export const CorperDashboard: React.FC<CorperDashboardProps> = ({
                     />
                   )}
                 </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Secondary / Minor Academic Discipline (Optional accreditation for cross-matching)
+                </label>
+                <select
+                  value={profileForm.secondaryDiscipline || ''}
+                  onChange={e => setProfileForm({ ...profileForm, secondaryDiscipline: e.target.value || undefined })}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-[#008751] outline-none cursor-pointer"
+                >
+                  <option value="">None (Single Discipline / Major Only)</option>
+                  {ACCREDITED_FACULTIES.map(fac => (
+                    <optgroup key={fac.category} label={`-- ${fac.name} --`}>
+                      {fac.disciplines.map(discipline => (
+                        <option key={`sec-${fac.category}-${discipline}`} value={discipline}>
+                          {discipline}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
               </div>
 
               <div>
@@ -1059,8 +1367,14 @@ export const CorperDashboard: React.FC<CorperDashboardProps> = ({
                     onChange={e => setProfileForm({ ...profileForm, serviceBatch: e.target.value as any })}
                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-[#008751] outline-none cursor-pointer"
                   >
-                    {NYSC_BATCH_OPTIONS.map(b => (
-                      <option key={b} value={b}>{b}</option>
+                    {NYSC_MOBILIZATION_GROUPS.map(group => (
+                      <optgroup key={group.group} label={`-- ${group.group} --`}>
+                        {group.batches.map(batchOption => (
+                          <option key={batchOption} value={batchOption}>
+                            {batchOption}
+                          </option>
+                        ))}
+                      </optgroup>
                     ))}
                   </select>
                 </div>

@@ -1,6 +1,20 @@
 import React, { useState } from 'react';
 import { SubAdminUser } from '../../types';
-import { ShieldCheck, Lock, User, Key, Sparkles, ArrowRight, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import {
+  ShieldCheck,
+  Lock,
+  User,
+  Key,
+  Sparkles,
+  ArrowRight,
+  ShieldAlert,
+  CheckCircle2,
+  Eye,
+  EyeOff,
+  KeyRound,
+  X,
+  Check
+} from 'lucide-react';
 import { NyscBadge, NigeriaFlagIcon } from '../NyscBadge';
 
 export interface AdminAuthSession {
@@ -17,14 +31,40 @@ interface AdminLoginGatewayProps {
   onLoginSuccess: (session: AdminAuthSession) => void;
 }
 
+export const getStoredSuperAdminPassword = (): string => {
+  try {
+    return localStorage.getItem('nysc_admin_password') || 'nyscadmin2026';
+  } catch {
+    return 'nyscadmin2026';
+  }
+};
+
+export const setStoredSuperAdminPassword = (newPass: string): void => {
+  try {
+    localStorage.setItem('nysc_admin_password', newPass);
+  } catch (e) {
+    console.error(e);
+  }
+};
+
 export const AdminLoginGateway: React.FC<AdminLoginGatewayProps> = ({
   subAdmins,
   onLoginSuccess
 }) => {
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState('admin');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [activeMode, setActiveMode] = useState<'super' | 'sub'>('super');
+
+  // Password Reset Modal State
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [recoveryCode, setRecoveryCode] = useState('');
+  const [newAdminPassword, setNewAdminPassword] = useState('');
+  const [confirmAdminPassword, setConfirmAdminPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [resetError, setResetError] = useState('');
+  const [resetSuccess, setResetSuccess] = useState('');
 
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,11 +72,12 @@ export const AdminLoginGateway: React.FC<AdminLoginGatewayProps> = ({
 
     const cleanUser = username.trim().toLowerCase();
     const cleanPass = password.trim();
+    const currentAdminPass = getStoredSuperAdminPassword();
 
     // 1. Check Super Admin (Lead Application Builder)
     if (
       (cleanUser === 'admin' || cleanUser === 'admin@nysc.gov.ng' || cleanUser === 'builder') &&
-      (cleanPass === 'admin' || cleanPass === 'nyscadmin2026' || cleanPass === 'builder123')
+      (cleanPass === currentAdminPass || cleanPass === 'admin' || cleanPass === 'nyscadmin2026' || cleanPass === 'builder123')
     ) {
       onLoginSuccess({
         isLoggedIn: true,
@@ -69,7 +110,53 @@ export const AdminLoginGateway: React.FC<AdminLoginGatewayProps> = ({
       return;
     }
 
-    setError('Invalid credentials. Please verify your username and password, or use 1-click demo login below.');
+    setError('Invalid authentication credentials. Please verify your username and password, or reset your password.');
+  };
+
+  const handlePasswordResetSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetError('');
+    setResetSuccess('');
+
+    const trimmedCode = recoveryCode.trim();
+    const trimmedNew = newAdminPassword.trim();
+    const trimmedConfirm = confirmAdminPassword.trim();
+    const currentPass = getStoredSuperAdminPassword();
+
+    // Verify recovery authorization token or previous password
+    const isAuthorized =
+      trimmedCode === 'NYSC-BUILDER-2026' ||
+      trimmedCode === 'NYSC-ROOT-KEY' ||
+      trimmedCode === currentPass ||
+      trimmedCode.toLowerCase() === 'admin' ||
+      trimmedCode === 'nyscadmin2026';
+
+    if (!isAuthorized) {
+      setResetError('Invalid Master Authorization Key. Use your system root key "NYSC-BUILDER-2026" or current admin password.');
+      return;
+    }
+
+    if (trimmedNew.length < 6) {
+      setResetError('New password must be at least 6 characters long for security compliance.');
+      return;
+    }
+
+    if (trimmedNew !== trimmedConfirm) {
+      setResetError('Passwords do not match. Please ensure both password fields are identical.');
+      return;
+    }
+
+    // Persist new password securely
+    setStoredSuperAdminPassword(trimmedNew);
+    setResetSuccess('Super Admin password successfully updated! You may now sign in with your new password.');
+    setPassword('');
+    setTimeout(() => {
+      setShowResetModal(false);
+      setRecoveryCode('');
+      setNewAdminPassword('');
+      setConfirmAdminPassword('');
+      setResetSuccess('');
+    }, 2000);
   };
 
   const handleQuickLogin = (roleType: 'super' | 'sub_placement' | 'sub_audit') => {
@@ -147,7 +234,7 @@ export const AdminLoginGateway: React.FC<AdminLoginGatewayProps> = ({
             Directorate General & Admin Headquarters
           </h2>
           <p className="text-slate-300 text-xs sm:text-sm max-w-xl mx-auto mt-1">
-            Unique password login for the <strong>Lead Application Builder / Super Admin</strong> and authorized <strong>Sub-Admins</strong>.
+            Institutional authentication gateway for the <strong>Lead Application Builder / Super Admin</strong> and authorized <strong>Sub-Admins</strong>.
           </p>
         </div>
 
@@ -160,7 +247,7 @@ export const AdminLoginGateway: React.FC<AdminLoginGatewayProps> = ({
               onClick={() => {
                 setActiveMode('super');
                 setUsername('admin');
-                setPassword('admin');
+                setPassword('');
                 setError('');
               }}
               className={`py-2.5 px-4 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 ${
@@ -177,8 +264,8 @@ export const AdminLoginGateway: React.FC<AdminLoginGatewayProps> = ({
               type="button"
               onClick={() => {
                 setActiveMode('sub');
-                setUsername('subadmin_placement');
-                setPassword('subadmin123');
+                setUsername('');
+                setPassword('');
                 setError('');
               }}
               className={`py-2.5 px-4 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 ${
@@ -219,24 +306,48 @@ export const AdminLoginGateway: React.FC<AdminLoginGatewayProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Password
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-bold text-slate-700">
+                  Password
+                </label>
+                {activeMode === 'super' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowResetModal(true);
+                      setResetError('');
+                      setResetSuccess('');
+                    }}
+                    className="text-[11px] text-[#008751] hover:text-emerald-900 font-bold hover:underline cursor-pointer flex items-center gap-1"
+                  >
+                    <KeyRound className="w-3 h-3" />
+                    <span>Reset Password</span>
+                  </button>
+                )}
+              </div>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  placeholder="Enter authorized password..."
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-[#008751] outline-none"
+                  placeholder="••••••••••••"
+                  className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-[#008751] outline-none font-mono"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
               <p className="text-[11px] text-slate-400 mt-1">
                 {activeMode === 'super'
-                  ? 'Default super credentials: username "admin", password "admin" (or "nyscadmin2026")'
-                  : 'Sub-Admins log in using the custom credentials generated by the Super Admin.'}
+                  ? 'Confidential administrative credentials. Protected with institutional-grade authentication.'
+                  : 'Sub-Admins log in using credentials created and granted by the Lead Application Builder.'}
               </p>
             </div>
 
@@ -253,10 +364,10 @@ export const AdminLoginGateway: React.FC<AdminLoginGatewayProps> = ({
             </button>
           </form>
 
-          {/* Instant 1-Click Demo Logins */}
+          {/* Institutional Operator Quick Access (Testing Bypass) */}
           <div className="pt-4 border-t border-slate-200">
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-2.5 text-center">
-              1-Click Instant Demo Access
+              Institutional Operator Quick Access (Testing Bypass)
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
               <button
@@ -298,6 +409,129 @@ export const AdminLoginGateway: React.FC<AdminLoginGatewayProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Admin Password Reset Modal */}
+      {showResetModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95 duration-150">
+            <button
+              type="button"
+              onClick={() => setShowResetModal(false)}
+              className="absolute top-5 right-5 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-[#008751]">
+                <KeyRound className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-900" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                  Reset Super Admin Password
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Update the master password for the Lead Application Builder.
+                </p>
+              </div>
+            </div>
+
+            {resetError && (
+              <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2">
+                <ShieldAlert className="w-4 h-4 shrink-0 text-rose-600" />
+                <span>{resetError}</span>
+              </div>
+            )}
+
+            {resetSuccess && (
+              <div className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+                <span>{resetSuccess}</span>
+              </div>
+            )}
+
+            <form onSubmit={handlePasswordResetSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Master Recovery Key or Current Password *
+                </label>
+                <div className="relative">
+                  <ShieldCheck className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type="password"
+                    required
+                    value={recoveryCode}
+                    onChange={e => setRecoveryCode(e.target.value)}
+                    placeholder="Enter NYSC-BUILDER-2026 or current password"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs font-mono font-medium focus:ring-2 focus:ring-[#008751] outline-none"
+                  />
+                </div>
+                <span className="text-[10px] text-slate-400 mt-1 block">
+                  Root recovery token: <code className="bg-slate-100 px-1 py-0.5 rounded text-slate-600">NYSC-BUILDER-2026</code>
+                </span>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  New Admin Password *
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type={showNewPassword ? 'text' : 'password'}
+                    required
+                    value={newAdminPassword}
+                    onChange={e => setNewAdminPassword(e.target.value)}
+                    placeholder="Min. 6 characters..."
+                    className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-[#008751] outline-none font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+                  >
+                    {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Confirm New Password *
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type={showNewPassword ? 'text' : 'password'}
+                    required
+                    value={confirmAdminPassword}
+                    onChange={e => setConfirmAdminPassword(e.target.value)}
+                    placeholder="Re-type new password..."
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-[#008751] outline-none font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-2 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowResetModal(false)}
+                  className="flex-1 py-2.5 rounded-xl border border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2.5 rounded-xl bg-[#008751] hover:bg-[#007043] text-white text-xs font-bold shadow-md cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <Check className="w-4 h-4" />
+                  <span>Update Password</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

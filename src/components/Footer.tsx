@@ -34,7 +34,9 @@ export const Footer: React.FC<FooterProps> = ({ onSelectState, onSelectTab, soci
           {/* Col 1: NYSC Identity & Anthem */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <NyscBadge size={44} />
+              <div className="p-1.5 rounded-xl bg-white/10 backdrop-blur-xs border border-white/15 shadow-sm shrink-0">
+                <NyscBadge size={44} />
+              </div>
               <div>
                 <span className="font-bold text-white text-base block font-sans">Ease My NYSC</span>
                 <span className="text-emerald-400 text-xs font-semibold">Service and Humility</span>

@@ -135,8 +135,8 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ onSelectTab }) => {
         <div className="relative z-10 h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-between py-12 md:py-16">
           {/* Top Bar inside hero */}
           <div className="flex items-center justify-between">
-            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-[#C89D3C]/40 text-[#f6d884] text-xs font-semibold tracking-wide">
-              <Sparkles className="w-4 h-4 text-[#C89D3C]" />
+            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-[#C89D3C]/40 text-[#f6d884] text-xs font-semibold tracking-wide shadow-md">
+              <NyscBadge size={22} className="shrink-0" />
               <span>{slide.badge}</span>
               <span className="text-white/40">•</span>
               <span className="flex items-center gap-1 text-emerald-200">
